@@ -1,4 +1,11 @@
 /** @type {import('tailwindcss').Config} */
+
+// Colors come from CSS variables ("R G B" channels) set at runtime by
+// src/theme/themes.js, so learners can switch themes without a rebuild.
+const v = (name) => `rgb(var(--c-${name}) / <alpha-value>)`;
+const shades = (name) =>
+  Object.fromEntries([50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((s) => [s, v(`${name}-${s}`)]));
+
 export default {
   content: [
     "./index.html",
@@ -7,55 +14,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        // "Orchid & Marigold" palette
-        orchid: {
-          50: '#F5F3FF',
-          100: '#EBE7FF',
-          200: '#D6CEFF',
-          300: '#B8A9FF',
-          400: '#8F7BFA',
-          500: '#6D5DF6',
-          600: '#5B4BDB',
-          700: '#4A3BB8',
-          800: '#382C8C',
-          900: '#261E5E',
-        },
-        marigold: {
-          100: '#FFF1D6',
-          200: '#FFE0A3',
-          400: '#FBBF3C',
-          500: '#F5A524',
-          600: '#D98A0B',
-          700: '#A86A06',
-        },
-        coral: {
-          100: '#FFE4E0',
-          400: '#FF8A7D',
-          500: '#FF6B5B',
-          600: '#E5503F',
-          700: '#B83A2C',
-        },
-        mint: {
-          100: '#DCFCE7',
-          500: '#22C55E',
-          600: '#16A34A',
-          700: '#15803D',
-        },
-        cream: '#FFF9F2',
+        primary: shades('primary'),
+        accent: shades('accent'),
+        highlight: shades('highlight'),
+        success: shades('success'),
+        'on-primary': v('on-primary'),
+        'on-accent': v('on-accent'),
+        'on-highlight': v('on-highlight'),
+        page: v('page'),
+        surface: v('surface'),
         ink: {
-          DEFAULT: '#1F1B2E',
-          muted: '#6B6680',
-          faint: '#A7A3B5',
+          DEFAULT: v('ink'),
+          muted: v('ink-muted'),
+          faint: v('ink-faint'),
         },
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Padauk', 'Prompt', 'sans-serif'],
+        sans: ['var(--font-sans)', 'Padauk', 'Prompt', 'sans-serif'],
         myanmar: ['Padauk', 'sans-serif'],
         thai: ['Prompt', 'sans-serif'],
       },
       boxShadow: {
-        soft: '0 1px 2px rgba(31, 27, 46, 0.04), 0 8px 24px -8px rgba(31, 27, 46, 0.10)',
-        lift: '0 2px 4px rgba(31, 27, 46, 0.05), 0 16px 40px -12px rgba(91, 75, 219, 0.28)',
+        soft: '0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -8px rgb(0 0 0 / 0.10)',
+        lift: '0 2px 4px rgb(0 0 0 / 0.05), 0 16px 40px -12px rgb(var(--c-primary-600) / 0.35)',
       },
       borderRadius: {
         '4xl': '2rem',

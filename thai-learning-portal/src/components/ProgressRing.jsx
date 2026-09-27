@@ -1,4 +1,7 @@
-export default function ProgressRing({ value, size = 64, stroke = 7, color = '#5B4BDB', track = '#EBE7FF', labelClassName = 'text-ink' }) {
+// color / track are theme shade names like "primary-600"; "white-20" is translucent white
+const toCss = (name) => (name === 'white-20' ? 'rgb(255 255 255 / 0.2)' : `rgb(var(--c-${name}))`);
+
+export default function ProgressRing({ value, size = 64, stroke = 7, color = 'primary-600', track = 'primary-100', labelClassName = 'text-ink' }) {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (Math.min(Math.max(value, 0), 100) / 100) * circumference;
@@ -6,17 +9,17 @@ export default function ProgressRing({ value, size = 64, stroke = 7, color = '#5
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={track} strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={stroke} style={{ stroke: toCss(track) }} />
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={color}
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
+          style={{ stroke: toCss(color) }}
           className="transition-[stroke-dashoffset] duration-700"
         />
       </svg>

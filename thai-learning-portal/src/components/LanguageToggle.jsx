@@ -17,7 +17,7 @@ export default function LanguageToggle({ onDark = false }) {
     <div
       role="group"
       aria-label="Language"
-      className={`inline-flex rounded-full p-1 text-sm font-semibold ${onDark ? 'bg-white/15' : 'bg-orchid-50'}`}
+      className={`inline-flex rounded-full p-1 text-sm font-semibold ${onDark ? 'bg-white/15' : 'bg-primary-50'}`}
     >
       {languages.map(({ code, label }) => {
         const active = i18n.language === code;
@@ -29,10 +29,10 @@ export default function LanguageToggle({ onDark = false }) {
             aria-pressed={active}
             className={`rounded-full px-3 py-1 transition-colors duration-200 ${
               active
-                ? 'bg-white text-orchid-700 shadow-sm'
+                ? 'bg-surface text-primary-700 shadow-sm'
                 : onDark
                   ? 'text-white/80 hover:text-white'
-                  : 'text-ink-muted hover:text-orchid-700'
+                  : 'text-ink-muted hover:text-primary-700'
             }`}
           >
             {label}

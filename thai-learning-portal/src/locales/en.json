@@ -80,5 +80,24 @@
   "assignments": {
     "pronunciation": "Weekly Pronunciation",
     "writing": "Writing Practice"
+  },
+  "theme": {
+    "button": "Change theme",
+    "title": "Theme",
+    "subtitle": "Choose the portal's colors. Your choice is saved on this device.",
+    "presets": "Presets",
+    "custom": "Your own colors",
+    "customized": "Custom",
+    "font": "Font",
+    "reset": "Reset to preset",
+    "close": "Close",
+    "fields": {
+      "primary": "Main color",
+      "accent": "Accent",
+      "highlight": "Highlight",
+      "success": "Success",
+      "background": "Background",
+      "text": "Text"
+    }
   }
 }

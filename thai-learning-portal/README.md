@@ -59,6 +59,7 @@ thai-learning-portal/
 │   │   ├── ProgressRing.jsx # Circular progress
 │   │   ├── Icon.jsx         # Inline SVG icons
 │   │   ├── Logo.jsx         # Brand mark
+│   │   ├── ThemePicker.jsx  # Theme panel (presets + custom colors)
 │   │   ├── Card.jsx         # Card component
 │   │   ├── Input.jsx        # Form input with validation
 │   │   ├── Header.jsx       # App header
@@ -67,6 +68,7 @@ thai-learning-portal/
 │   ├── pages/               # Page components
 │   │   ├── LoginPage.jsx    # Login/Auth page
 │   │   └── DashboardPage.jsx # Dashboard page
+│   ├── theme/               # Theme presets, color generation, ThemeProvider
 │   ├── locales/             # Translations
 │   │   ├── en.json          # English translations
 │   │   └── my.json          # Myanmar translations
@@ -84,17 +86,21 @@ thai-learning-portal/
 
 ## 🎨 Design System
 
-### Colors — "Orchid & Marigold"
-- **Orchid:** #5B4BDB (Primary — Thailand's national flower)
-- **Marigold:** #FBBF3C / #F5A524 (Accent, calls to action)
-- **Coral:** #FF6B5B (Highlights, pending / error states)
-- **Mint:** #16A34A (Success)
-- **Cream:** #FFF9F2 (Background) · **Ink:** #1F1B2E (Text)
+### Colors & themes
+Learners pick their own theme with the palette button in the header (and on the login page):
+8 presets (Orchid & Marigold, Classic Thai Blue, Jade Temple, Lotus Pink, Andaman Sea,
+Saffron Robe, Rice Field, Night Market) or any custom colors, plus a font choice.
+The choice is saved in `localStorage` on that device.
 
-Each color has a tint scale in `tailwind.config.js` (e.g. `orchid-50` … `orchid-900`).
+How it works:
+- Components use role-based Tailwind colors: `primary`, `accent`, `highlight`, `success`
+  (each with `50`–`900` shades), plus `page`, `surface`, `ink`, `on-primary`, `on-accent`.
+- `tailwind.config.js` maps those to CSS variables; `src/theme/themes.js` generates every shade
+  from the six chosen colors and applies them at runtime (dark backgrounds get a dark surface).
+- Add or change presets in the `PRESETS` list in `src/theme/themes.js`.
 
 ### Typography
-- **UI / English:** Plus Jakarta Sans
+- **UI / English:** Plus Jakarta Sans by default (Nunito, Poppins or Lexend selectable)
 - **Myanmar Text:** Padauk (automatic fallback; taller line-height when `<html lang="my">`)
 - **Thai Text:** Prompt (`font-thai`)
 

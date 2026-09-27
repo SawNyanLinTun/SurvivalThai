@@ -7,9 +7,9 @@ import Icon from '../components/Icon';
 import ProgressRing from '../components/ProgressRing';
 
 const courses = [
-  { id: 1, key: 'beginner', thai: 'ก', progress: 45, lessons: 12, color: '#5B4BDB', track: '#EBE7FF', tile: 'bg-orchid-100 text-orchid-700', tone: 'orchid' },
-  { id: 2, key: 'intermediate', thai: 'ข', progress: 20, lessons: 15, color: '#F5A524', track: '#FFF1D6', tile: 'bg-marigold-100 text-marigold-700', tone: 'marigold' },
-  { id: 3, key: 'advanced', thai: 'ค', progress: 0, lessons: 20, color: '#FF6B5B', track: '#FFE4E0', tile: 'bg-coral-100 text-coral-700', tone: 'coral' },
+  { id: 1, key: 'beginner', thai: 'ก', progress: 45, lessons: 12, color: 'primary-600', track: 'primary-100', tile: 'bg-primary-100 text-primary-700', tone: 'primary' },
+  { id: 2, key: 'intermediate', thai: 'ข', progress: 20, lessons: 15, color: 'accent-500', track: 'accent-100', tile: 'bg-accent-100 text-accent-700', tone: 'accent' },
+  { id: 3, key: 'advanced', thai: 'ค', progress: 0, lessons: 20, color: 'highlight-500', track: 'highlight-100', tile: 'bg-highlight-100 text-highlight-700', tone: 'highlight' },
 ];
 
 const assignments = [
@@ -29,10 +29,10 @@ export default function DashboardPage() {
   const totalLessons = courses.reduce((sum, c) => sum + c.lessons, 0);
   const lessonsDone = courses.reduce((sum, c) => sum + Math.round((c.progress / 100) * c.lessons), 0);
   const stats = [
-    { label: t('dashboard.stats.inProgress'), value: courses.filter((c) => c.progress > 0).length, icon: 'book', tile: 'bg-orchid-100 text-orchid-700' },
-    { label: t('dashboard.stats.lessonsDone'), value: `${lessonsDone}/${totalLessons}`, icon: 'check', tile: 'bg-mint-100 text-mint-700' },
-    { label: t('dashboard.stats.pending'), value: assignments.filter((a) => a.status === 'pending').length, icon: 'clock', tile: 'bg-coral-100 text-coral-700' },
-    { label: t('dashboard.stats.overall'), value: `${Math.round((lessonsDone / totalLessons) * 100)}%`, icon: 'chart', tile: 'bg-marigold-100 text-marigold-700' },
+    { label: t('dashboard.stats.inProgress'), value: courses.filter((c) => c.progress > 0).length, icon: 'book', tile: 'bg-primary-100 text-primary-700' },
+    { label: t('dashboard.stats.lessonsDone'), value: `${lessonsDone}/${totalLessons}`, icon: 'check', tile: 'bg-success-100 text-success-700' },
+    { label: t('dashboard.stats.pending'), value: assignments.filter((a) => a.status === 'pending').length, icon: 'clock', tile: 'bg-highlight-100 text-highlight-700' },
+    { label: t('dashboard.stats.overall'), value: `${Math.round((lessonsDone / totalLessons) * 100)}%`, icon: 'chart', tile: 'bg-accent-100 text-accent-700' },
   ];
 
   const current = courses.find((c) => c.progress > 0) || courses[0];
@@ -43,24 +43,24 @@ export default function DashboardPage() {
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:py-10">
         {/* Hero */}
-        <section className="relative overflow-hidden rounded-4xl bg-gradient-to-br from-orchid-600 via-orchid-700 to-orchid-900 p-6 text-white shadow-lift sm:p-10">
+        <section className="relative overflow-hidden rounded-4xl bg-gradient-to-br from-primary-600 to-primary-900 p-6 text-white shadow-lift sm:p-10">
           <div className="bg-dots absolute inset-0" aria-hidden="true" />
-          <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-marigold-400/30 blur-3xl" aria-hidden="true" />
+          <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-accent-400/30 blur-3xl" aria-hidden="true" />
           <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
             <div className="max-w-xl">
               <h1 className="text-3xl font-extrabold sm:text-4xl">
-                {t('dashboard.welcome')}, <span className="text-marigold-400">{name}</span>! 👋
+                {t('dashboard.welcome')}, <span className="text-accent-400">{name}</span>! 👋
               </h1>
-              <p className="mt-3 text-orchid-100">{t('dashboard.heroSubtitle')}</p>
+              <p className="mt-3 text-white/80">{t('dashboard.heroSubtitle')}</p>
               <Button variant="accent" size="lg" className="mt-6">
                 {t('dashboard.continueLearning')}: {t(`courses.titles.${current.key}`)}
                 <Icon name="arrowRight" />
               </Button>
             </div>
             <div className="flex items-center gap-4 rounded-3xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm">
-              <ProgressRing value={current.progress} size={84} stroke={8} color="#FBBF3C" track="rgba(255,255,255,0.2)" labelClassName="text-white" />
+              <ProgressRing value={current.progress} size={84} stroke={8} color="accent-400" track="white-20" labelClassName="text-white" />
               <div>
-                <p className="text-sm text-orchid-200">{t('dashboard.myCourseProgress')}</p>
+                <p className="text-sm text-white/70">{t('dashboard.myCourseProgress')}</p>
                 <p className="text-lg font-bold">{t(`courses.titles.${current.key}`)}</p>
               </div>
             </div>
@@ -117,10 +117,10 @@ export default function DashboardPage() {
           <aside className="space-y-8">
             <section>
               <h2 className="mb-5 text-2xl font-extrabold text-ink">{t('dashboard.phraseOfDay')}</h2>
-              <Card className="relative overflow-hidden border-marigold-200 bg-gradient-to-br from-marigold-100 to-white">
-                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-marigold-200/60" aria-hidden="true" />
+              <Card className="relative overflow-hidden border-accent-200 bg-gradient-to-br from-accent-100 to-surface">
+                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-accent-200/60" aria-hidden="true" />
                 <p className="relative font-thai text-4xl font-bold text-ink">สวัสดีครับ</p>
-                <p className="relative mt-1 text-sm font-semibold tracking-wide text-marigold-700">sa-wat-dee khrap</p>
+                <p className="relative mt-1 text-sm font-semibold tracking-wide text-accent-700">sa-wat-dee khrap</p>
                 <p className="relative mt-3 text-ink-muted">{t('dashboard.phraseMeaning')}</p>
                 <Button variant="secondary" size="sm" className="relative mt-4">
                   <Icon name="speaker" className="h-4 w-4" />
@@ -131,12 +131,12 @@ export default function DashboardPage() {
 
             <section>
               <h2 className="mb-5 text-2xl font-extrabold text-ink">{t('dashboard.assignments')}</h2>
-              <Card className="divide-y divide-orchid-100/70 !p-0">
+              <Card className="divide-y divide-primary-100/70 !p-0">
                 {assignments.map((a) => {
                   const done = a.status === 'completed';
                   return (
                     <div key={a.id} className="flex items-center gap-4 p-5">
-                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${done ? 'bg-mint-100 text-mint-700' : 'bg-coral-100 text-coral-700'}`}>
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${done ? 'bg-success-100 text-success-700' : 'bg-highlight-100 text-highlight-700'}`}>
                         <Icon name={done ? 'check' : 'document'} />
                       </span>
                       <div className="min-w-0 flex-1">
@@ -146,7 +146,7 @@ export default function DashboardPage() {
                           {t('dashboard.due')}: {formatDate(a.dueDate)}
                         </p>
                       </div>
-                      <Badge tone={done ? 'mint' : 'coral'}>
+                      <Badge tone={done ? 'success' : 'highlight'}>
                         {done ? t('courses.completed') : t('dashboard.pending')}
                       </Badge>
                     </div>

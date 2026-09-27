@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Prompt:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,7 +10,7 @@
   }
 
   body {
-    @apply bg-cream font-sans text-ink;
+    @apply bg-page font-sans text-ink;
     margin: 0;
   }
 
@@ -26,7 +26,7 @@
   }
 
   ::selection {
-    @apply bg-orchid-200 text-orchid-900;
+    @apply bg-primary-200 text-primary-900;
   }
 }
 
@@ -52,10 +52,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d6ceff;
+  background: rgb(var(--c-primary-200));
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8f7bfa;
+  background: rgb(var(--c-primary-400));
 }
