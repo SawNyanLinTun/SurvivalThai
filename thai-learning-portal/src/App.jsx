@@ -4,6 +4,8 @@ import './index.css';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import TeacherDashboardPage from './pages/TeacherDashboardPage';
+import CreateClassPage from './pages/teacher/CreateClassPage';
+import ClassWorkspacePage from './pages/teacher/ClassWorkspacePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider } from './theme/ThemeContext';
 import { getUser, homeFor } from './auth';
@@ -32,6 +34,22 @@ export default function App() {
             element={
               <ProtectedRoute role="teacher">
                 <TeacherDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/classes/new"
+            element={
+              <ProtectedRoute role="teacher">
+                <CreateClassPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/classes/:classId/:tab?"
+            element={
+              <ProtectedRoute role="teacher">
+                <ClassWorkspacePage />
               </ProtectedRoute>
             }
           />

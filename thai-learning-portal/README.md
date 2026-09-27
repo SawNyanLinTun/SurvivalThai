@@ -8,6 +8,8 @@ Learn Thai language designed for Myanmar speakers - Bilingual Myanmar + English 
 - ✅ Responsive design (mobile, tablet, desktop)
 - ✅ User authentication with form validation
 - ✅ Student and Teacher login with separate dashboards
+- ✅ Teachers create classes, each with Modules, Assignments (with grading), Students (join code),
+  Messages (announcements + private chats), Certificates and Settings
 - ✅ Course dashboard with progress tracking
 - ✅ Assignment management
 - 🔜 Interactive pronunciation learning (coming soon)
@@ -66,6 +68,8 @@ thai-learning-portal/
 │   │   ├── Icon.jsx         # Inline SVG icons
 │   │   ├── Logo.jsx         # Brand mark
 │   │   ├── ThemePicker.jsx  # Theme panel (presets + custom colors)
+│   │   ├── Form.jsx / Modal.jsx / EmptyState.jsx # Shared UI
+│   │   └── classroom/       # Class workspace tabs + Certificate
 │   │   ├── Card.jsx         # Card component
 │   │   ├── Input.jsx        # Form input with validation
 │   │   ├── Header.jsx       # App header
@@ -74,12 +78,15 @@ thai-learning-portal/
 │   ├── pages/               # Page components
 │   │   ├── LoginPage.jsx    # Login/Auth page
 │   │   ├── DashboardPage.jsx # Student dashboard
-│   │   └── TeacherDashboardPage.jsx # Teacher dashboard
+│   │   ├── TeacherDashboardPage.jsx # Teacher dashboard
+│   │   └── teacher/         # Create class + class workspace pages
 │   ├── theme/               # Theme presets, color generation, ThemeProvider
 │   ├── locales/             # Translations
 │   │   ├── en.json          # English translations
 │   │   └── my.json          # Myanmar translations
 │   ├── auth.js              # Demo auth (login/logout, roles)
+│   ├── data/                # Class store, seed data, class options
+│   ├── utils/               # Date/id helpers
 │   ├── App.jsx              # Main app component with routing
 │   ├── main.jsx             # Entry point
 │   ├── i18n.js              # i18next configuration
@@ -128,6 +135,23 @@ The app supports Myanmar and English languages:
 - Language toggle in header
 - Browser language detection
 - Language preference saved in localStorage
+
+## 🏫 Teacher classroom
+
+From the teacher dashboard, **New class** opens `/teacher/classes/new`. Each class has a workspace at
+`/teacher/classes/:classId/:tab` with these tabs:
+
+| Tab | What teachers can do |
+|-----|----------------------|
+| Modules | Group resources (lesson text, video, audio, file, link) into weeks/units; reorder, publish/unpublish |
+| Assignments | Create pronunciation, writing or quiz work with due date, points and module; grade submissions |
+| Students | Share the join code, add students by email, message or remove them |
+| Messages | Class announcements plus a private thread with each student |
+| Certificate | Design (title, signer, style), set requirements, issue/revoke and print certificates |
+| Settings | Edit details, publish the class, message/late/grade rules, new join code, delete class |
+
+Data lives in `src/data/classStore.js` (demo: `localStorage`, seeded from `src/data/seed.js`).
+Components only use its hooks and actions, so it can be swapped for API calls later.
 
 ## 🔒 Authentication
 

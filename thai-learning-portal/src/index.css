@@ -59,3 +59,25 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(var(--c-primary-400));
 }
+
+/* Print only the certificate when one is open */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+}
