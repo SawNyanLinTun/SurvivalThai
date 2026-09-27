@@ -7,19 +7,22 @@ import Button from '../../components/Button';
 import Icon from '../../components/Icon';
 import { TextArea, TextField, Toggle } from '../../components/Form';
 import { createClass } from '../../data/classStore';
-import { displayName, getUser } from '../../auth';
+import { useAuth } from '../../auth/AuthContext';
+import { displayName } from '../../auth/helpers';
+import { addDays, formatDate } from '../../utils/format';
 import { LETTERS, LEVELS, TONES } from '../../data/classMeta';
 
 export default function CreateClassPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { profile } = useAuth();
+  const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
     name: '',
     level: 'beginner',
     description: '',
     schedule: '',
-    startDate: '',
-    endDate: '',
+    startDate: new Date().toISOString().slice(0, 10),
     letter: 'ก',
     tone: 'primary',
     certificate: true,
@@ -27,15 +30,21 @@ export default function CreateClassPage() {
   const [errors, setErrors] = useState({});
   const set = (key) => (e) => setForm({ ...form, [key]: e?.target ? e.target.value : e });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const next = {};
     if (!form.name.trim()) next.name = t('auth.required');
-    if (form.startDate && form.endDate && form.endDate < form.startDate) next.endDate = t('classroom.create.endBeforeStart');
+    if (!form.startDate) next.startDate = t('auth.required');
     setErrors(next);
     if (Object.keys(next).length) return;
-    const id = createClass({ ...form, name: form.name.trim(), signer: displayName(getUser()) });
-    navigate(`/teacher/classes/${id}/modules`);
+    setBusy(true);
+    try {
+      const id = await createClass({ ...form, name: form.name.trim(), signer: displayName(profile) });
+      navigate(`/teacher/classes/${id}/modules`);
+    } catch {
+      setErrors({ form: t('auth.errors.server_error') });
+      setBusy(false);
+    }
   };
 
   const tone = TONES[form.tone];
@@ -99,16 +108,22 @@ export default function CreateClassPage() {
                 value={form.schedule}
                 onChange={set('schedule')}
               />
-              <div className="grid gap-5 sm:grid-cols-2">
-                <TextField label={t('classroom.fields.startDate')} type="date" value={form.startDate} onChange={set('startDate')} />
-                <TextField
-                  label={t('classroom.fields.endDate')}
-                  type="date"
-                  value={form.endDate}
-                  onChange={set('endDate')}
-                  error={errors.endDate}
-                />
-              </div>
+              <TextField
+                label={t('classroom.fields.startDate')}
+                type="date"
+                required
+                value={form.startDate}
+                onChange={set('startDate')}
+                error={errors.startDate}
+              />
+              {form.startDate && (
+                <p className="rounded-xl bg-primary-50 px-4 py-3 text-sm text-primary-700">
+                  {t('classroom.dates.summary', {
+                    end: formatDate(addDays(form.startDate, 60), i18n.language),
+                    purge: formatDate(addDays(form.startDate, 74), i18n.language),
+                  })}
+                </p>
+              )}
             </Card>
 
             <Card className="space-y-5">
@@ -175,9 +190,10 @@ export default function CreateClassPage() {
                 </p>
               )}
             </Card>
-            <Button type="submit" size="lg" className="mt-5 w-full">
+            {errors.form && <p className="mt-4 text-sm font-medium text-highlight-600">{errors.form}</p>}
+            <Button type="submit" size="lg" className="mt-5 w-full" disabled={busy}>
               <Icon name="plus" />
-              {t('classroom.create.submit')}
+              {busy ? t('common.loading') : t('classroom.create.submit')}
             </Button>
             <p className="mt-3 text-center text-xs text-ink-muted">{t('classroom.create.draftNote')}</p>
           </aside>

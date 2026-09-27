@@ -7,6 +7,7 @@ export default function Input({
   required = false,
   type = 'text',
   icon,
+  className = '',
   ...props
 }) {
   const id = useId();
@@ -32,7 +33,7 @@ export default function Input({
           className={`
             w-full rounded-xl border-2 bg-surface py-3 pr-4 text-ink placeholder:text-ink-faint
             transition-all duration-200 focus:outline-none focus:ring-4
-            ${icon ? 'pl-11' : 'pl-4'}
+            ${icon ? 'pl-11' : 'pl-4'} ${className}
             ${error
               ? 'border-highlight-400 focus:border-highlight-500 focus:ring-highlight-100'
               : 'border-primary-100 hover:border-primary-200 focus:border-primary-500 focus:ring-primary-100'}

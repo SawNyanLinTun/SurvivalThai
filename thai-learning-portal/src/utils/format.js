@@ -29,3 +29,14 @@ export function joinCode() {
 export function initials(name = '') {
   return name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?';
 }
+
+export function addDays(iso, days) {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+export function daysUntil(iso) {
+  const today = new Date(new Date().toISOString().slice(0, 10));
+  return Math.round((new Date(iso) - today) / 86400000);
+}

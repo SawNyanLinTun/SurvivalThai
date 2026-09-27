@@ -8,7 +8,7 @@ import Modal, { ConfirmModal } from '../Modal';
 import EmptyState from '../EmptyState';
 import IconButton from './IconButton';
 import { TextField } from '../Form';
-import { addStudent, removeStudent } from '../../data/classStore';
+import { addStudent, removeStudent, resetDevices } from '../../data/classStore';
 import { formatDate, initials } from '../../utils/format';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,8 +17,11 @@ function AddStudentModal({ cls, onClose }) {
   const { t } = useTranslation();
   const [form, setForm] = useState({ name: '', email: '' });
   const [errors, setErrors] = useState({});
+  const [busy, setBusy] = useState(false);
+  const [created, setCreated] = useState(null); // { email, password }
+  const [copied, setCopied] = useState(false);
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     const next = {};
     if (!form.name.trim()) next.name = t('auth.required');
@@ -26,16 +29,59 @@ function AddStudentModal({ cls, onClose }) {
     else if (cls.students.some((s) => s.email.toLowerCase() === form.email.toLowerCase())) next.email = t('classroom.students.duplicate');
     setErrors(next);
     if (Object.keys(next).length) return;
-    addStudent(cls.id, { name: form.name.trim(), email: form.email.trim() });
-    onClose();
+    setBusy(true);
+    try {
+      const password = await addStudent(cls.id, { name: form.name.trim(), email: form.email.trim() });
+      setCreated({ email: form.email.trim().toLowerCase(), password });
+    } catch (err) {
+      setErrors({ email: t(`auth.errors.${err.message}`, { defaultValue: t('auth.errors.server_error') }) });
+    } finally {
+      setBusy(false);
+    }
   };
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(`${created.email}\n${created.password}`);
+      setCopied(true);
+    } catch {
+      // clipboard unavailable; details stay visible to copy by hand
+    }
+  };
+
+  if (created) {
+    return (
+      <Modal title={t('classroom.students.createdTitle')} onClose={onClose} size="sm">
+        <div className="space-y-4">
+          <p className="text-sm text-ink-muted">{t('classroom.students.createdText')}</p>
+          <dl className="space-y-2 rounded-2xl bg-page p-4">
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-ink-muted">{t('auth.email')}</dt>
+              <dd className="select-all break-all font-mono text-ink">{created.email}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-ink-muted">{t('classroom.students.tempPassword')}</dt>
+              <dd className="select-all font-mono text-lg font-bold tracking-wider text-ink">{created.password}</dd>
+            </div>
+          </dl>
+          <p className="text-xs text-highlight-700">{t('classroom.students.passwordOnce')}</p>
+          <div className="flex gap-3">
+            <Button variant="secondary" className="flex-1" onClick={copy}>
+              <Icon name={copied ? 'check' : 'copy'} /> {copied ? t('classroom.copied') : t('classroom.copy')}
+            </Button>
+            <Button className="flex-1" onClick={onClose}>{t('common.close')}</Button>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal title={t('classroom.students.add')} onClose={onClose} size="sm">
       <form onSubmit={save} className="space-y-5" noValidate>
         <TextField label={t('classroom.students.name')} required value={form.name} error={errors.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <TextField label={t('auth.email')} type="email" required value={form.email} error={errors.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <Button type="submit" className="w-full">{t('classroom.students.add')}</Button>
+        <Button type="submit" className="w-full" disabled={busy}>{busy ? t('common.loading') : t('classroom.students.add')}</Button>
       </form>
     </Modal>
   );
@@ -85,12 +131,13 @@ export default function StudentsTab({ cls }) {
         <EmptyState icon="users" title={t('classroom.students.emptyTitle')} text={t('classroom.students.emptyText')} />
       ) : (
         <Card className="overflow-x-auto !p-0">
-          <table className="w-full min-w-[40rem] text-left text-sm">
+          <table className="w-full min-w-[46rem] text-left text-sm">
             <thead className="border-b border-primary-100 text-xs uppercase tracking-wider text-ink-muted">
               <tr>
                 <th className="px-5 py-3 font-semibold">{t('teacher.table.student')}</th>
                 <th className="px-5 py-3 font-semibold">{t('teacher.table.progress')}</th>
                 <th className="px-5 py-3 font-semibold">{t('teacher.table.lastActive')}</th>
+                <th className="px-5 py-3 font-semibold">{t('classroom.students.devices')}</th>
                 <th className="px-5 py-3"><span className="sr-only">{t('classroom.actions')}</span></th>
               </tr>
             </thead>
@@ -120,6 +167,27 @@ export default function StudentsTab({ cls }) {
                     {s.lastActive ? formatDate(s.lastActive, i18n.language) : t('classroom.students.invited')}
                   </td>
                   <td className="px-5 py-3">
+                    <div className="flex items-center gap-2">
+                      <span
+                        title={s.devices.map((d) => d.label).join('\n')}
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ${
+                          s.devices.length >= 2 ? 'bg-highlight-100 text-highlight-700' : 'bg-primary-50 text-primary-700'
+                        }`}
+                      >
+                        {s.devices.length}/2
+                      </span>
+                      {s.devices.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setDialog({ kind: 'reset', student: s })}
+                          className="text-xs font-semibold text-primary-700 hover:underline"
+                        >
+                          {t('classroom.students.resetDevices')}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-5 py-3">
                     <div className="flex justify-end">
                       <IconButton icon="chat" label={t('classroom.students.message')} onClick={() => navigate(`../messages?thread=${s.id}`, { relative: 'path' })} />
                       <IconButton icon="trash" tone="danger" label={t('classroom.students.remove')} onClick={() => setDialog({ kind: 'remove', student: s })} />
@@ -133,12 +201,21 @@ export default function StudentsTab({ cls }) {
       )}
 
       {dialog?.kind === 'add' && <AddStudentModal cls={cls} onClose={close} />}
+      {dialog?.kind === 'reset' && (
+        <ConfirmModal
+          title={t('classroom.students.resetDevices')}
+          message={t('classroom.students.resetMessage', { name: dialog.student.name })}
+          confirmLabel={t('classroom.students.resetDevices')}
+          onConfirm={() => resetDevices(cls.id, dialog.student.id).catch(() => {})}
+          onClose={close}
+        />
+      )}
       {dialog?.kind === 'remove' && (
         <ConfirmModal
           title={t('classroom.students.remove')}
           message={t('classroom.students.removeMessage', { name: dialog.student.name })}
           confirmLabel={t('classroom.students.remove')}
-          onConfirm={() => removeStudent(cls.id, dialog.student.id)}
+          onConfirm={() => removeStudent(cls.id, dialog.student.id).catch(() => {})}
           onClose={close}
         />
       )}

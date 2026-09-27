@@ -78,7 +78,7 @@ export default function CertificateTab({ cls }) {
 
             <div>
               <p className="mb-2 text-xs font-bold uppercase tracking-wider text-ink-muted">{t('classroom.create.preview')}</p>
-              <Certificate cert={cert} courseName={cls.name} studentName="May Thu" number="ST-2026-0000" date={today} />
+              <Certificate cert={cert} courseName={cls.name} studentName="May Thu" number="ST-2026-00000" date={today} />
             </div>
           </div>
 
@@ -88,7 +88,9 @@ export default function CertificateTab({ cls }) {
               <Button
                 variant="accent"
                 disabled={!eligibleNotIssued.length}
-                onClick={() => eligibleNotIssued.forEach((s) => issueCertificate(cls.id, s.id))}
+                onClick={async () => {
+                  for (const s of eligibleNotIssued) await issueCertificate(cls.id, s.id).catch(() => {});
+                }}
               >
                 <Icon name="trophy" /> {t('classroom.certificate.issueAll', { count: eligibleNotIssued.length })}
               </Button>
@@ -115,14 +117,14 @@ export default function CertificateTab({ cls }) {
                           <Button size="sm" variant="secondary" onClick={() => setViewing({ student: s, issued })}>
                             {t('classroom.certificate.view')}
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => revokeCertificate(cls.id, s.id)}>
+                          <Button size="sm" variant="ghost" onClick={() => revokeCertificate(cls.id, s.id).catch(() => {})}>
                             {t('classroom.certificate.revoke')}
                           </Button>
                         </>
                       ) : eligible ? (
                         <>
                           <Badge tone="accent">{t('classroom.certificate.eligible')}</Badge>
-                          <Button size="sm" onClick={() => issueCertificate(cls.id, s.id)}>{t('classroom.certificate.issue')}</Button>
+                          <Button size="sm" onClick={() => issueCertificate(cls.id, s.id).catch(() => {})}>{t('classroom.certificate.issue')}</Button>
                         </>
                       ) : (
                         <Badge tone="neutral">{t('classroom.certificate.notEligible')}</Badge>

@@ -1,16 +1,19 @@
 import { Navigate } from 'react-router-dom';
-import { getUser, homeFor } from '../auth';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../auth/AuthContext';
+import { homeFor } from '../auth/helpers';
+import Spinner from './Spinner';
 
 export default function ProtectedRoute({ role, children }) {
-  const user = getUser();
+  const { profile, loading } = useAuth();
+  const { t } = useTranslation();
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
+  if (loading) return <Spinner label={t('common.loading')} />;
+  if (!profile) return <Navigate to="/" replace />;
 
   // Logged in with the other role: send them to their own dashboard
-  if (role && user.role !== role) {
-    return <Navigate to={homeFor(user.role)} replace />;
+  if (role && profile.role !== role) {
+    return <Navigate to={homeFor(profile.role)} replace />;
   }
 
   return children;

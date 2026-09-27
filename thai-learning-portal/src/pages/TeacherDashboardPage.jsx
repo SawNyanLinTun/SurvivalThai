@@ -7,8 +7,10 @@ import Badge from '../components/Badge';
 import Icon from '../components/Icon';
 import ProgressRing from '../components/ProgressRing';
 import EmptyState from '../components/EmptyState';
-import { displayName, getUser } from '../auth';
-import { pendingSubmissions, useClasses } from '../data/classStore';
+import { useAuth } from '../auth/AuthContext';
+import { displayName } from '../auth/helpers';
+import Spinner from '../components/Spinner';
+import { pendingSubmissions, useClassesState } from '../data/classStore';
 import { TONES, classProgress } from '../data/classMeta';
 import { formatDate } from '../utils/format';
 
@@ -35,8 +37,9 @@ function NewClassButton({ variant = 'primary', size = 'md' }) {
 
 export default function TeacherDashboardPage() {
   const { t, i18n } = useTranslation();
-  const name = displayName(getUser());
-  const classes = useClasses();
+  const { profile } = useAuth();
+  const name = displayName(profile);
+  const { classes, loaded } = useClassesState();
   const fmt = (iso) => formatDate(iso, i18n.language, { month: 'short', day: 'numeric' });
 
   const submissions = classes.flatMap((c) => pendingSubmissions(c).map((s) => ({ ...s, cls: c })));
@@ -50,6 +53,15 @@ export default function TeacherDashboardPage() {
     { label: t('teacher.stats.toReview'), value: submissions.length, icon: 'document', tile: 'bg-highlight-100 text-highlight-700' },
     { label: t('teacher.stats.avgProgress'), value: `${avgProgress}%`, icon: 'chart', tile: 'bg-accent-100 text-accent-700' },
   ];
+
+  if (!loaded) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <Spinner label={t('common.loading')} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

@@ -7,11 +7,12 @@ import Logo from '../components/Logo';
 import LanguageToggle from '../components/LanguageToggle';
 import Icon from '../components/Icon';
 import ThemePicker from '../components/ThemePicker';
-import { homeFor, login } from '../auth';
+import { useAuth } from '../auth/AuthContext';
+import { homeFor } from '../auth/helpers';
 
 const roles = [
-  { id: 'student', icon: 'student', demo: 'student@example.com' },
-  { id: 'teacher', icon: 'teacher', demo: 'teacher@example.com' },
+  { id: 'student', icon: 'student' },
+  { id: 'teacher', icon: 'teacher' },
 ];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,31 +26,55 @@ const features = [
 export default function LoginPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { signIn, joinClass, notice, clearNotice } = useAuth();
   const [role, setRole] = useState('student');
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [mode, setMode] = useState('login'); // 'login' | 'join' (students only)
+  const [formData, setFormData] = useState({ email: '', password: '', fullName: '', joinCode: '' });
   const [errors, setErrors] = useState({});
-  const activeRole = roles.find((r) => r.id === role);
+  const [formError, setFormError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const joining = role === 'student' && mode === 'join';
+  const set = (key) => (e) => setFormData({ ...formData, [key]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const chooseRole = (id) => {
+    setRole(id);
+    setMode('login');
+    setFormError(null);
+    clearNotice();
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
     if (!formData.email) newErrors.email = t('auth.required');
     else if (!EMAIL_PATTERN.test(formData.email)) newErrors.email = t('auth.invalidEmail');
     if (!formData.password) newErrors.password = t('auth.required');
+    if (joining) {
+      if (!formData.fullName.trim()) newErrors.fullName = t('auth.required');
+      if (!/^[A-Za-z0-9]{6}$/.test(formData.joinCode.trim())) newErrors.joinCode = t('auth.errors.invalid_code');
+      if (formData.password && formData.password.length < 8) newErrors.password = t('auth.errors.weak_password');
+    }
+    setErrors(newErrors);
+    setFormError(null);
+    clearNotice();
+    if (Object.keys(newErrors).length) return;
 
-    if (Object.keys(newErrors).length === 0) {
-      login({ email: formData.email, role });
-      navigate(homeFor(role));
-    } else {
-      setErrors(newErrors);
+    setBusy(true);
+    try {
+      const email = formData.email.trim();
+      const profile = joining
+        ? await joinClass({ joinCode: formData.joinCode.trim(), fullName: formData.fullName.trim(), email, password: formData.password })
+        : await signIn({ email, password: formData.password, role });
+      navigate(homeFor(profile.role));
+    } catch (err) {
+      setFormError(err.message);
+    } finally {
+      setBusy(false);
     }
   };
 
-  const fillDemo = () => {
-    setFormData({ email: activeRole.demo, password: 'demo1234' });
-    setErrors({});
-  };
+  const shownError = formError || notice;
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
@@ -99,8 +124,10 @@ export default function LoginPage() {
 
         <div className="flex flex-1 items-center justify-center px-6 py-10 sm:px-10">
           <div className="w-full max-w-md">
-            <h2 className="text-3xl font-extrabold tracking-tight text-ink">{t('auth.loginButton')}</h2>
-            <p className="mt-2 text-ink-muted">{t('auth.subtitle')}</p>
+            <h2 className="text-3xl font-extrabold tracking-tight text-ink">
+              {joining ? t('auth.joinTitle') : t('auth.loginButton')}
+            </h2>
+            <p className="mt-2 text-ink-muted">{joining ? t('auth.joinSubtitle') : t('auth.subtitle')}</p>
 
             <fieldset className="mt-8">
               <legend className="mb-2 text-sm font-semibold text-ink">{t('auth.roleLabel')}</legend>
@@ -121,7 +148,7 @@ export default function LoginPage() {
                         name="role"
                         value={r.id}
                         checked={active}
-                        onChange={() => setRole(r.id)}
+                        onChange={() => chooseRole(r.id)}
                         className="sr-only"
                       />
                       <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? 'bg-primary-600 text-on-primary' : 'bg-primary-50 text-primary-700'}`}>
@@ -140,55 +167,90 @@ export default function LoginPage() {
               </div>
             </fieldset>
 
+            {shownError && (
+              <div role="alert" className="mt-6 rounded-2xl border border-highlight-200 bg-highlight-100/60 px-4 py-3 text-sm font-medium text-highlight-700">
+                {t(`auth.errors.${shownError}`, { defaultValue: t('auth.errors.server_error') })}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="mt-6 space-y-5" noValidate>
+              {joining && (
+                <>
+                  <Input
+                    label={t('auth.joinCode')}
+                    icon="userPlus"
+                    autoComplete="off"
+                    placeholder="KB7Q2M"
+                    maxLength={6}
+                    required
+                    error={errors.joinCode}
+                    value={formData.joinCode}
+                    onChange={(e) => setFormData({ ...formData, joinCode: e.target.value.toUpperCase() })}
+                    className="font-mono uppercase tracking-[0.3em]"
+                  />
+                  <Input
+                    label={t('auth.fullName')}
+                    icon="student"
+                    autoComplete="name"
+                    required
+                    error={errors.fullName}
+                    value={formData.fullName}
+                    onChange={set('fullName')}
+                  />
+                </>
+              )}
+
               <Input
                 label={t('auth.email')}
                 type="email"
                 icon="mail"
                 autoComplete="email"
-                placeholder={activeRole.demo}
+                placeholder="name@example.com"
                 required
                 error={errors.email}
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={set('email')}
               />
 
               <Input
                 label={t('auth.password')}
                 type="password"
                 icon="lock"
-                autoComplete="current-password"
+                autoComplete={joining ? 'new-password' : 'current-password'}
                 placeholder="••••••••"
                 required
                 error={errors.password}
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={set('password')}
               />
 
-              <Button type="submit" size="lg" className="w-full">
-                {t('auth.loginAs', { role: t(`auth.${role}`) })}
-                <Icon name="arrowRight" />
+              <Button type="submit" size="lg" className="w-full" disabled={busy}>
+                {busy ? t('common.loading') : joining ? t('auth.joinButton') : t('auth.loginAs', { role: t(`auth.${role}`) })}
+                {!busy && <Icon name="arrowRight" />}
               </Button>
             </form>
 
-            <button
-              type="button"
-              onClick={fillDemo}
-              className="group mt-8 flex w-full items-center gap-4 rounded-2xl border-2 border-dashed border-accent-200 bg-accent-100/60 p-4 text-left transition-colors hover:border-accent-400 hover:bg-accent-100"
-            >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-400 text-ink">
-                <Icon name="sparkles" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-bold text-ink">
-                  {t('auth.demoTitle')} · {t(`auth.${role}`)}
+            {role === 'student' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(joining ? 'login' : 'join');
+                  setErrors({});
+                  setFormError(null);
+                }}
+                className="group mt-8 flex w-full items-center gap-4 rounded-2xl border-2 border-dashed border-accent-200 bg-accent-100/60 p-4 text-left transition-colors hover:border-accent-400 hover:bg-accent-100"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-400 text-on-accent">
+                  <Icon name={joining ? 'lock' : 'userPlus'} />
                 </span>
-                <span className="block truncate text-sm text-ink-muted">
-                  {activeRole.demo} · {t('auth.demoHint')}
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-bold text-ink">{joining ? t('auth.haveAccount') : t('auth.newStudent')}</span>
+                  <span className="block text-sm text-ink-muted">{joining ? t('auth.backToLogin') : t('auth.joinHint')}</span>
                 </span>
-              </span>
-              <Icon name="arrowRight" className="h-5 w-5 text-accent-700 transition-transform group-hover:translate-x-1" />
-            </button>
+                <Icon name="arrowRight" className="h-5 w-5 text-accent-700 transition-transform group-hover:translate-x-1" />
+              </button>
+            )}
+            {role === 'teacher' && <p className="mt-8 text-center text-sm text-ink-muted">{t('auth.teacherHint')}</p>}
           </div>
         </div>
       </main>

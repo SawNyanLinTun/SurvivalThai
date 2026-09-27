@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Card from '../Card';
 import Icon from '../Icon';
-import { sendMessage } from '../../data/classStore';
+import { refreshClasses, sendMessage } from '../../data/classStore';
 import { formatTime, initials } from '../../utils/format';
 
 export default function MessagesTab({ cls }) {
@@ -25,11 +25,18 @@ export default function MessagesTab({ cls }) {
     endRef.current?.scrollIntoView({ block: 'end' });
   }, [active.id, messages.length]);
 
+  // Pick up student replies while this tab is open.
+  useEffect(() => {
+    const timer = setInterval(() => document.visibilityState === 'visible' && refreshClasses(), 20000);
+    return () => clearInterval(timer);
+  }, []);
+
   const send = (e) => {
     e.preventDefault();
-    if (!draft.trim()) return;
-    sendMessage(cls.id, active.id, draft.trim());
+    const text = draft.trim();
+    if (!text) return;
     setDraft('');
+    sendMessage(cls.id, active.id, text).catch(() => setDraft(text));
   };
 
   return (

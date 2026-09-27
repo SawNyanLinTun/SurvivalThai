@@ -140,10 +140,10 @@ export default function ModulesTab({ cls }) {
               <IconButton
                 icon={m.published ? 'eyeSlash' : 'eye'}
                 label={m.published ? t('classroom.unpublish') : t('classroom.publish')}
-                onClick={() => updateModule(cls.id, m.id, { published: !m.published })}
+                onClick={() => updateModule(cls.id, m.id, { published: !m.published }).catch(() => {})}
               />
-              <IconButton icon="chevronUp" label={t('classroom.moveUp')} disabled={mi === 0} onClick={() => moveModule(cls.id, mi, -1)} />
-              <IconButton icon="chevronDown" label={t('classroom.moveDown')} disabled={mi === cls.modules.length - 1} onClick={() => moveModule(cls.id, mi, 1)} />
+              <IconButton icon="chevronUp" label={t('classroom.moveUp')} disabled={mi === 0} onClick={() => moveModule(cls.id, mi, -1).catch(() => {})} />
+              <IconButton icon="chevronDown" label={t('classroom.moveDown')} disabled={mi === cls.modules.length - 1} onClick={() => moveModule(cls.id, mi, 1).catch(() => {})} />
               <IconButton icon="pencil" label={t('common.edit')} onClick={() => setDialog({ kind: 'rename', module: m })} />
               <IconButton icon="trash" tone="danger" label={t('common.delete')} onClick={() => setDialog({ kind: 'deleteModule', module: m })} />
             </div>
@@ -165,9 +165,9 @@ export default function ModulesTab({ cls }) {
                   )}
                   <p className="text-xs text-ink-muted">{t(`classroom.itemTypes.${item.type}`)}</p>
                 </div>
-                <IconButton icon="chevronUp" label={t('classroom.moveUp')} disabled={ii === 0} onClick={() => moveModuleItem(cls.id, m.id, ii, -1)} />
-                <IconButton icon="chevronDown" label={t('classroom.moveDown')} disabled={ii === m.items.length - 1} onClick={() => moveModuleItem(cls.id, m.id, ii, 1)} />
-                <IconButton icon="trash" tone="danger" label={t('common.delete')} onClick={() => deleteModuleItem(cls.id, m.id, item.id)} />
+                <IconButton icon="chevronUp" label={t('classroom.moveUp')} disabled={ii === 0} onClick={() => moveModuleItem(cls.id, m.id, ii, -1).catch(() => {})} />
+                <IconButton icon="chevronDown" label={t('classroom.moveDown')} disabled={ii === m.items.length - 1} onClick={() => moveModuleItem(cls.id, m.id, ii, 1).catch(() => {})} />
+                <IconButton icon="trash" tone="danger" label={t('common.delete')} onClick={() => deleteModuleItem(cls.id, m.id, item.id).catch(() => {})} />
               </li>
             ))}
           </ul>
@@ -184,23 +184,23 @@ export default function ModulesTab({ cls }) {
       ))}
 
       {dialog?.kind === 'newModule' && (
-        <ModuleTitleModal title={t('classroom.modules.addModule')} onSave={(title) => addModule(cls.id, title)} onClose={close} />
+        <ModuleTitleModal title={t('classroom.modules.addModule')} onSave={(title) => addModule(cls.id, title).catch(() => {})} onClose={close} />
       )}
       {dialog?.kind === 'rename' && (
         <ModuleTitleModal
           title={t('classroom.modules.renameModule')}
           initial={dialog.module.title}
-          onSave={(title) => updateModule(cls.id, dialog.module.id, { title })}
+          onSave={(title) => updateModule(cls.id, dialog.module.id, { title }).catch(() => {})}
           onClose={close}
         />
       )}
-      {dialog?.kind === 'item' && <ItemModal onSave={(item) => addModuleItem(cls.id, dialog.module.id, item)} onClose={close} />}
+      {dialog?.kind === 'item' && <ItemModal onSave={(item) => addModuleItem(cls.id, dialog.module.id, item).catch(() => {})} onClose={close} />}
       {dialog?.kind === 'deleteModule' && (
         <ConfirmModal
           title={t('classroom.modules.deleteTitle')}
           message={t('classroom.modules.deleteMessage', { name: dialog.module.title })}
           confirmLabel={t('common.delete')}
-          onConfirm={() => deleteModule(cls.id, dialog.module.id)}
+          onConfirm={() => deleteModule(cls.id, dialog.module.id).catch(() => {})}
           onClose={close}
         />
       )}

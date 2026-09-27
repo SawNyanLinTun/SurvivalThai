@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import Header from '../../components/Header';
 import Badge from '../../components/Badge';
 import Icon from '../../components/Icon';
-import { useClass, pendingSubmissions } from '../../data/classStore';
+import { dismissError, pendingSubmissions, useClassesState } from '../../data/classStore';
+import Spinner from '../../components/Spinner';
+import { formatDate } from '../../utils/format';
 import { TONES } from '../../data/classMeta';
 import ModulesTab from '../../components/classroom/ModulesTab';
 import AssignmentsTab from '../../components/classroom/AssignmentsTab';
@@ -22,10 +24,19 @@ const TABS = [
 ];
 
 export default function ClassWorkspacePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { classId, tab = 'modules' } = useParams();
-  const cls = useClass(classId);
+  const { classes, loaded, error } = useClassesState();
+  const cls = classes.find((c) => c.id === classId);
 
+  if (!loaded) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <Spinner label={t('common.loading')} />
+      </div>
+    );
+  }
   if (!cls) return <Navigate to="/teacher" replace />;
   const current = TABS.find((x) => x.id === tab);
   if (!current) return <Navigate to={`/teacher/classes/${classId}/modules`} replace />;
@@ -60,8 +71,29 @@ export default function ClassWorkspacePage() {
               {cls.schedule && <span>· {cls.schedule}</span>}
               <span>· {t('classroom.joinCode')}: <b className="font-mono text-ink">{cls.joinCode}</b></span>
             </div>
+            <p className="mt-1 text-xs text-ink-muted">
+              {t('classroom.dates.range', {
+                start: formatDate(cls.startDate, i18n.language),
+                end: formatDate(cls.endDate, i18n.language),
+                purge: formatDate(cls.purgeAfter, i18n.language),
+              })}
+            </p>
           </div>
         </div>
+
+        {cls.purgedAt && (
+          <div className="mt-5 rounded-2xl border border-accent-200 bg-accent-100/60 px-4 py-3 text-sm text-accent-700">
+            {t('classroom.dates.purged')}
+          </div>
+        )}
+        {error && (
+          <div role="alert" className="mt-5 flex items-start justify-between gap-3 rounded-2xl border border-highlight-200 bg-highlight-100/60 px-4 py-3 text-sm text-highlight-700">
+            <span>{t(`auth.errors.${error}`, { defaultValue: t('classroom.saveFailed', { message: error }) })}</span>
+            <button type="button" onClick={dismissError} aria-label={t('common.close')} className="shrink-0 font-bold">
+              <Icon name="close" className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         <nav className="-mx-4 mt-6 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label={t('classroom.tabsLabel')}>
           <div className="flex min-w-max gap-1 border-b border-primary-100">

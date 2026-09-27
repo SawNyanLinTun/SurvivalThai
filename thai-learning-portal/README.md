@@ -31,6 +31,9 @@ cd thai-learning-portal
 # Install dependencies
 npm install
 
+# Point the app at Supabase (values are public; see .env.example)
+cp .env.example .env
+
 # Start development server
 npm run dev
 ```
@@ -45,16 +48,16 @@ npm run build
 
 Output goes to `/dist` folder
 
-## 📝 Test Login
+## 📝 Accounts
 
-Choose **Student** or **Teacher** on the login page, then:
+Logins are real Supabase accounts; there is no demo login any more.
 
-| Role | Email | Goes to |
-|------|-------|---------|
-| Student | student@example.com | `/dashboard` |
-| Teacher | teacher@example.com | `/teacher` |
+| Who | How they get an account |
+|-----|-------------------------|
+| **Teacher** | Their email is added to the `teacher_emails` table (Supabase → Table Editor), and the account is created in Supabase → Authentication → **Add user**. Anyone signing up with a listed email becomes a teacher. |
+| **Student** | Either signs up on the login page with the class **join code** ("New student?"), or the teacher adds them in the class's **Students** tab and hands over the temporary password shown once. |
 
-Any password works in the demo (any valid email works too).
+Each student account belongs to exactly one class and is deleted with it (see *Data retention*).
 
 ## 🏗️ Project Structure
 
@@ -150,20 +153,41 @@ From the teacher dashboard, **New class** opens `/teacher/classes/new`. Each cla
 | Certificate | Design (title, signer, style), set requirements, issue/revoke and print certificates |
 | Settings | Edit details, publish the class, message/late/grade rules, new join code, delete class |
 
-Data lives in `src/data/classStore.js` (demo: `localStorage`, seeded from `src/data/seed.js`).
-Components only use its hooks and actions, so it can be swapped for API calls later.
+Teacher data goes through `src/data/classStore.js`; student data through `src/data/studentStore.js`.
+Both talk to Supabase directly — the database's Row Level Security decides what each user can see.
 
-## 🔒 Authentication
+## 🗄️ Backend (Supabase)
 
-Demo authentication with two roles, handled in `src/auth.js`:
-- The login page has a **Student / Teacher** selector; the chosen role is saved with the email
-  in `localStorage` (the password is never stored).
-- Students land on `/dashboard` (courses, assignments); teachers land on `/teacher`
-  (classes, submissions to review, student progress).
-- `ProtectedRoute role="..."` sends logged-out users to login and redirects users who open
-  the other role's page back to their own dashboard.
-- Production: replace `src/auth.js` with a real backend API (JWT or sessions) that checks
-  passwords and returns the user's role.
+Project `ttutmyqifrnxnpeoovvm` (region ap-southeast-1, Singapore). Everything is in `supabase/`:
+
+| Path | What it is |
+|------|------------|
+| `migrations/…001_core_schema.sql` | Tables, Row Level Security policies, sign-up trigger |
+| `migrations/…002_functions.sql` | Device limit, certificates, join codes, column-level update limits |
+| `migrations/…003_retention.sql` | Private `class-files` bucket + daily cleanup schedule (pg_cron) |
+| `migrations/…004_private_helpers.sql` | Security hardening from the Supabase advisor |
+| `migrations/…005_fix_signup_and_purge.sql` | Fixes found in end-to-end testing |
+| `functions/join-class` | Student sign-up with a join code (public) |
+| `functions/manage-students` | Teacher adds/removes students, deletes a class (needs teacher login) |
+| `functions/purge-expired` | Daily cleanup job (called by pg_cron) |
+
+**Who can see what** (enforced in the database, not just the UI):
+- Teachers see and change only their own classes and those classes' students.
+- Students see only their own class — published modules and assignments, class announcements and
+  their own private thread with the teacher — plus their own submissions and certificate.
+- Nobody can change their own role; students can't grade themselves or post announcements.
+
+### Data retention
+- Every class runs **exactly 60 days** from its start date (`end_date` is computed by the database).
+- After the end date the class is read-only for students (no new submissions or messages).
+- **14 days later** (`purge_after` = start + 74 days) the daily job at 03:17 UTC deletes the class's
+  student accounts, their submissions, messages, devices and uploaded files.
+- Kept: the teacher's modules and assignments, and certificate records (number, name, class, date),
+  which can still be verified with the public `verify_certificate` function.
+
+### Device limit
+Each student account works on at most **2 devices** (browsers). A third device is refused at login.
+Teachers see the device count in the Students tab and can **Reset devices** when a student changes phone.
 
 ## 📱 Responsive Design
 
@@ -177,6 +201,7 @@ Demo authentication with two roles, handled in `src/auth.js`:
 - **Styling:** Tailwind CSS
 - **Routing:** React Router v6
 - **Internationalization:** i18next
+- **Backend:** Supabase (Postgres + Row Level Security, Auth, Storage, Edge Functions, pg_cron)
 - **Build Tool:** Vite
 - **Package Manager:** npm
 
@@ -193,30 +218,13 @@ npm run build
 npm run deploy
 ```
 
-## 📚 Next Steps (Phase 2)
+## 📚 Next Steps
 
-1. **Backend API Integration**
-   - Connect to Node.js/Express backend
-   - Replace localStorage with real database
-   - User authentication with JWT
-
-2. **Pronunciation Learning**
-   - Audio comparison: Thai vs Myanmar sounds
-   - Tone mark explanations
-   - Voice recording practice
-
-3. **Advanced Features**
-   - Video lesson playback
-   - Downloadable course materials
-   - Progress analytics
-   - Teacher dashboard
-   - Assignment grading
-
-4. **Deployment**
-   - Deploy frontend to Vercel
-   - Deploy backend to Railway
-   - Connect custom domain
-   - SSL certificate setup
+1. **Video lessons** — embedded player (YouTube/Bunny/Vimeo) with the student's name as a watermark,
+   then signed, expiring video links through an Edge Function
+2. **In-browser voice recording** for pronunciation assignments (currently a file upload / phone recorder)
+3. **"Copy class for a new group"** — reuse modules and assignments for the next 60-day class
+4. **Enable leaked-password protection** in Supabase → Authentication → Settings
 
 ## 💰 Hosting & Cost
 

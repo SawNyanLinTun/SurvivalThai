@@ -4,16 +4,17 @@ import LanguageToggle from './LanguageToggle';
 import ThemePicker from './ThemePicker';
 import Logo from './Logo';
 import Icon from './Icon';
-import { displayName, getUser, logout } from '../auth';
+import { useAuth } from '../auth/AuthContext';
+import { displayName } from '../auth/helpers';
 
 export default function Header() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const user = getUser();
+  const { profile: user, signOut } = useAuth();
   const name = displayName(user);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
 

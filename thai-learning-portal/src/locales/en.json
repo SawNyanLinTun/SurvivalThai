@@ -15,8 +15,6 @@
     "heroTitle": "Speak Thai with confidence",
     "heroSubtitle": "Lessons built for Myanmar speakers — from first greetings to everyday survival phrases.",
     "subtitle": "Welcome back! Log in to continue learning.",
-    "demoTitle": "Demo account",
-    "demoHint": "Any password works",
     "required": "This field is required",
     "learners": "Made for Myanmar learners in Thailand",
     "roleLabel": "Log in as",
@@ -25,7 +23,33 @@
     "studentDesc": "Take lessons and practice",
     "teacherDesc": "Manage classes and review work",
     "loginAs": "Log in as {{role}}",
-    "invalidEmail": "Enter a valid email address"
+    "invalidEmail": "Enter a valid email address",
+    "joinTitle": "Join your class",
+    "joinSubtitle": "Enter the 6-character code from your teacher and create your account.",
+    "joinCode": "Class join code",
+    "fullName": "Full name",
+    "joinButton": "Join class",
+    "newStudent": "New student?",
+    "joinHint": "Join with the code from your teacher",
+    "haveAccount": "Already have an account?",
+    "backToLogin": "Log in instead",
+    "teacherHint": "Teacher accounts are created by the school. Contact the administrator if you can't log in.",
+    "errors": {
+      "invalid_credentials": "Wrong email or password.",
+      "wrong_role_student": "This is a student account. Choose \"Student\" above to log in.",
+      "wrong_role_teacher": "This is a teacher account. Choose \"Teacher\" above to log in.",
+      "not_authorized": "This account doesn't have access yet. Ask your teacher or the school.",
+      "device_limit": "This account is already used on 2 devices. Ask your teacher to reset your devices.",
+      "invalid_code": "That class code doesn't exist. Check the 6 characters and try again.",
+      "class_ended": "This class has already ended.",
+      "email_taken": "An account with this email already exists. Log in instead.",
+      "weak_password": "Use at least 8 characters for your password.",
+      "invalid_email": "Enter a valid email address",
+      "invalid_name": "Enter your name",
+      "forbidden": "You don't have permission to do that.",
+      "not_found": "Not found.",
+      "server_error": "Something went wrong. Check your connection and try again."
+    }
   },
   "dashboard": {
     "title": "Thai Learning Portal",
@@ -242,7 +266,9 @@
       "emptyTitle": "No assignments yet",
       "emptyText": "Create a pronunciation, writing or quiz assignment.",
       "deleteTitle": "Delete assignment?",
-      "deleteMessage": "\"{{name}}\" and all its submissions will be deleted."
+      "deleteMessage": "\"{{name}}\" and all its submissions will be deleted.",
+      "openFile": "Open file",
+      "playFile": "Play recording"
     },
     "students": {
       "title_one": "{{count}} student",
@@ -257,7 +283,14 @@
       "remove": "Remove student",
       "removeMessage": "Remove {{name}} from this class? Their submissions and messages in this class will be deleted.",
       "emptyTitle": "No students yet",
-      "emptyText": "Share the join code or add students by email."
+      "emptyText": "Share the join code or add students by email.",
+      "createdTitle": "Student account created",
+      "createdText": "Give these login details to the student. They log in as \"Student\".",
+      "tempPassword": "Temporary password",
+      "passwordOnce": "This password is shown only once. Copy it now.",
+      "devices": "Devices",
+      "resetDevices": "Reset devices",
+      "resetMessage": "Remove all devices for {{name}}? They can then log in on up to 2 new devices."
     },
     "messages": {
       "announcements": "Class announcements",
@@ -322,6 +355,45 @@
       "deleteHint": "Deletes the class with all its modules, assignments, messages and certificates.",
       "deleteClass": "Delete this class",
       "deleteMessage": "Delete \"{{name}}\"? This cannot be undone."
+    },
+    "saveFailed": "Couldn't save: {{message}}",
+    "dates": {
+      "summary": "Class ends on {{end}} (60 days). Student accounts and their work are deleted on {{purge}}.",
+      "range": "{{start}} – {{end}} · Student data deleted {{purge}}",
+      "purged": "This class has ended and student data has been deleted. Your modules, assignments and certificate records are kept."
+    }
+  },
+  "student": {
+    "classRuns_one": "Class ends {{end}} · {{count}} day left",
+    "classRuns_other": "Class ends {{end}} · {{count}} days left",
+    "classEnded": "This class ended on {{end}}. You can still view your work and certificate.",
+    "dataNotice": "Your account and work are deleted on {{date}}",
+    "stats": {
+      "lessons": "Lessons",
+      "submitted": "Assignments handed in",
+      "daysLeft": "Days left"
+    },
+    "lessons": "Lessons",
+    "noLessons": "Your teacher hasn't published lessons yet.",
+    "noAssignments": "No assignments yet.",
+    "submit": "Hand in",
+    "resubmit": "Update",
+    "submitted": "Handed in",
+    "score": "{{score}} / {{points}}",
+    "recording": "Your recording",
+    "recordingHint": "On a phone you can record right away. Up to 10 MB.",
+    "recordingRequired": "Add a recording first.",
+    "note": "Note for your teacher (optional)",
+    "answer": "Your answer",
+    "messageTeacher": "Message your teacher…",
+    "repliesClosed": "Replies are closed for this class.",
+    "notAvailableTitle": "Your class isn't open yet",
+    "notAvailableText": "Your teacher hasn't published the class yet, or it has ended. Check back later.",
+    "certificateReady": "Your certificate is ready",
+    "errors": {
+      "file_too_large": "The file is too large (max 10 MB).",
+      "upload_failed": "Upload failed. Try again.",
+      "submit_failed": "Couldn't hand in. The due date may have passed."
     }
   }
 }

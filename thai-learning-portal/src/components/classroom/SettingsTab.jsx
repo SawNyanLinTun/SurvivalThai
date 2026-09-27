@@ -8,11 +8,12 @@ import { ConfirmModal } from '../Modal';
 import { SelectField, TextArea, TextField, Toggle } from '../Form';
 import { LETTERS, LEVELS, TONES } from '../../data/classMeta';
 import { deleteClass, regenerateJoinCode, updateClass } from '../../data/classStore';
+import { addDays, formatDate } from '../../utils/format';
 
-const DETAIL_KEYS = ['name', 'level', 'description', 'schedule', 'startDate', 'endDate', 'letter', 'tone'];
+const DETAIL_KEYS = ['name', 'level', 'description', 'schedule', 'startDate', 'letter', 'tone'];
 
 export default function SettingsTab({ cls }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [form, setForm] = useState(() => Object.fromEntries(DETAIL_KEYS.map((k) => [k, cls[k]])));
   const [errors, setErrors] = useState({});
@@ -23,17 +24,17 @@ export default function SettingsTab({ cls }) {
     setSaved(false);
     setForm({ ...form, [key]: e?.target ? e.target.value : e });
   };
-  const setSetting = (key) => (value) => updateClass(cls.id, (c) => ({ settings: { ...c.settings, [key]: value } }));
+  const setSetting = (key) => (value) => updateClass(cls.id, (c) => ({ settings: { ...c.settings, [key]: value } })).catch(() => {});
   const dirty = DETAIL_KEYS.some((k) => form[k] !== cls[k]);
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     const next = {};
     if (!form.name.trim()) next.name = t('auth.required');
-    if (form.startDate && form.endDate && form.endDate < form.startDate) next.endDate = t('classroom.create.endBeforeStart');
+    if (!form.startDate) next.startDate = t('auth.required');
     setErrors(next);
     if (Object.keys(next).length) return;
-    updateClass(cls.id, { ...form, name: form.name.trim() });
+    await updateClass(cls.id, { ...form, name: form.name.trim() }).catch(() => {});
     setSaved(true);
   };
 
@@ -51,10 +52,22 @@ export default function SettingsTab({ cls }) {
           />
           <TextArea label={t('classroom.fields.description')} value={form.description} onChange={set('description')} />
           <TextField label={t('classroom.fields.schedule')} value={form.schedule} onChange={set('schedule')} />
-          <div className="grid gap-5 sm:grid-cols-2">
-            <TextField label={t('classroom.fields.startDate')} type="date" value={form.startDate} onChange={set('startDate')} />
-            <TextField label={t('classroom.fields.endDate')} type="date" value={form.endDate} onChange={set('endDate')} error={errors.endDate} />
-          </div>
+          <TextField
+            label={t('classroom.fields.startDate')}
+            type="date"
+            required
+            value={form.startDate}
+            onChange={set('startDate')}
+            error={errors.startDate}
+          />
+          {form.startDate && (
+            <p className="rounded-xl bg-primary-50 px-4 py-3 text-sm text-primary-700">
+              {t('classroom.dates.summary', {
+                end: formatDate(addDays(form.startDate, 60), i18n.language),
+                purge: formatDate(addDays(form.startDate, 74), i18n.language),
+              })}
+            </p>
+          )}
           <div className="grid gap-5 sm:grid-cols-2">
             <SelectField
               label={t('classroom.fields.letter')}
@@ -87,7 +100,7 @@ export default function SettingsTab({ cls }) {
             label={t('classroom.settings.published')}
             description={t('classroom.settings.publishedHint')}
             checked={cls.published}
-            onChange={(v) => updateClass(cls.id, { published: v })}
+            onChange={(v) => updateClass(cls.id, { published: v }).catch(() => {})}
           />
           <Toggle
             label={t('classroom.settings.allowMessages')}
@@ -142,7 +155,7 @@ export default function SettingsTab({ cls }) {
           title={t('classroom.settings.newCode')}
           message={t('classroom.settings.newCodeMessage')}
           confirmLabel={t('classroom.settings.newCode')}
-          onConfirm={() => regenerateJoinCode(cls.id)}
+          onConfirm={() => regenerateJoinCode(cls.id).catch(() => {})}
           onClose={() => setConfirm(null)}
         />
       )}
@@ -151,9 +164,9 @@ export default function SettingsTab({ cls }) {
           title={t('classroom.settings.deleteClass')}
           message={t('classroom.settings.deleteMessage', { name: cls.name })}
           confirmLabel={t('common.delete')}
-          onConfirm={() => {
+          onConfirm={async () => {
+            await deleteClass(cls.id).catch(() => {});
             navigate('/teacher', { replace: true });
-            deleteClass(cls.id);
           }}
           onClose={() => setConfirm(null)}
         />

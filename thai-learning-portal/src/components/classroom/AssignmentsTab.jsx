@@ -9,7 +9,7 @@ import EmptyState from '../EmptyState';
 import IconButton from './IconButton';
 import { SelectField, TextArea, TextField, Toggle } from '../Form';
 import { ASSIGNMENT_TYPES } from '../../data/classMeta';
-import { deleteAssignment, gradeSubmission, saveAssignment } from '../../data/classStore';
+import { deleteAssignment, gradeSubmission, saveAssignment, submissionFileUrl } from '../../data/classStore';
 import { formatDate } from '../../utils/format';
 
 function AssignmentModal({ cls, initial, onClose }) {
@@ -20,11 +20,15 @@ function AssignmentModal({ cls, initial, onClose }) {
   const [error, setError] = useState('');
   const set = (key) => (e) => setA({ ...a, [key]: e?.target ? e.target.value : e });
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (!a.title.trim()) return setError(t('auth.required'));
-    saveAssignment(cls.id, { ...a, title: a.title.trim(), points: Math.max(0, Number(a.points) || 0) });
-    onClose();
+    try {
+      await saveAssignment(cls.id, { ...a, title: a.title.trim(), points: Math.max(0, Number(a.points) || 0) });
+      onClose();
+    } catch {
+      setError(t('auth.errors.server_error'));
+    }
   };
 
   return (
@@ -73,6 +77,29 @@ function AssignmentModal({ cls, initial, onClose }) {
   );
 }
 
+function SubmissionFile({ path }) {
+  const { t } = useTranslation();
+  const [url, setUrl] = useState(null);
+  if (url) {
+    return /\.(webm|ogg|mp3|m4a|mp4|wav)$/i.test(path) ? (
+      <audio controls src={url} className="mt-2 w-full max-w-sm" />
+    ) : (
+      <a href={url} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm font-semibold text-primary-700 underline">
+        {t('classroom.assignments.openFile')}
+      </a>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={async () => setUrl(await submissionFileUrl(path))}
+      className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-primary-700 hover:underline"
+    >
+      <Icon name="speaker" className="h-4 w-4" /> {t('classroom.assignments.playFile')}
+    </button>
+  );
+}
+
 function Submissions({ cls, assignment }) {
   const { t, i18n } = useTranslation();
   const [scores, setScores] = useState({});
@@ -91,16 +118,18 @@ function Submissions({ cls, assignment }) {
               <p className="text-xs text-ink-muted">
                 {sub ? `${t('teacher.submitted')}: ${formatDate(sub.submittedAt, i18n.language)}` : t('classroom.assignments.notSubmitted')}
               </p>
+              {sub?.content && <p className="mt-1 whitespace-pre-wrap break-words rounded-lg bg-page px-3 py-2 text-sm text-ink">{sub.content}</p>}
+              {sub?.filePath && <SubmissionFile path={sub.filePath} />}
             </div>
             {sub?.status === 'graded' && <Badge tone="success">{t('classroom.assignments.graded')}</Badge>}
             {sub?.status === 'submitted' && <Badge tone="highlight">{t('classroom.assignments.toGrade')}</Badge>}
             {sub && (
               <form
                 className="flex items-center gap-2"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
                   if (draft === '') return;
-                  gradeSubmission(cls.id, assignment.id, st.id, Math.min(assignment.points, Math.max(0, Number(draft))));
+                  await gradeSubmission(cls.id, assignment.id, st.id, Math.min(assignment.points, Math.max(0, Number(draft)))).catch(() => {});
                   setScores((s) => ({ ...s, [st.id]: undefined }));
                 }}
               >
@@ -197,7 +226,7 @@ export default function AssignmentsTab({ cls }) {
           title={t('classroom.assignments.deleteTitle')}
           message={t('classroom.assignments.deleteMessage', { name: dialog.assignment.title })}
           confirmLabel={t('common.delete')}
-          onConfirm={() => deleteAssignment(cls.id, dialog.assignment.id)}
+          onConfirm={() => deleteAssignment(cls.id, dialog.assignment.id).catch(() => {})}
           onClose={close}
         />
       )}
