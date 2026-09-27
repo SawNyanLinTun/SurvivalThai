@@ -10,6 +10,11 @@ const resources = {
 
 const savedLanguage = localStorage.getItem('language') || 'my';
 
+// Keep <html lang> in sync so CSS can tune typography per script
+i18n.on('languageChanged', (lng) => {
+  document.documentElement.lang = lng;
+});
+
 i18n
   .use(initReactI18next)
   .init({

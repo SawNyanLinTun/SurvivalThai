@@ -1,23 +1,44 @@
 import { useTranslation } from 'react-i18next';
 
-export default function LanguageToggle() {
+const languages = [
+  { code: 'my', label: 'မြန်မာ' },
+  { code: 'en', label: 'EN' },
+];
+
+export default function LanguageToggle({ onDark = false }) {
   const { i18n } = useTranslation();
 
-  const toggleLanguage = () => {
-    const newLang = i18n.language === 'my' ? 'en' : 'my';
-    i18n.changeLanguage(newLang);
-    localStorage.setItem('language', newLang);
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('language', lng);
   };
 
   return (
-    <button
-      onClick={toggleLanguage}
-      className="
-        bg-white text-thai-blue px-4 py-2 rounded-lg font-semibold
-        hover:bg-gray-100 transition-colors duration-200
-      "
+    <div
+      role="group"
+      aria-label="Language"
+      className={`inline-flex rounded-full p-1 text-sm font-semibold ${onDark ? 'bg-white/15' : 'bg-orchid-50'}`}
     >
-      {i18n.language === 'my' ? 'English' : 'မြန်မာ'}
-    </button>
+      {languages.map(({ code, label }) => {
+        const active = i18n.language === code;
+        return (
+          <button
+            key={code}
+            type="button"
+            onClick={() => changeLanguage(code)}
+            aria-pressed={active}
+            className={`rounded-full px-3 py-1 transition-colors duration-200 ${
+              active
+                ? 'bg-white text-orchid-700 shadow-sm'
+                : onDark
+                  ? 'text-white/80 hover:text-white'
+                  : 'text-ink-muted hover:text-orchid-700'
+            }`}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
   );
 }

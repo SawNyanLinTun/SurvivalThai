@@ -11,7 +11,14 @@
     "features": "Features",
     "feature1": "Myanmar + English Bilingual Interface",
     "feature2": "Interactive Pronunciation Learning",
-    "feature3": "Weekly Assignments with Feedback"
+    "feature3": "Weekly Assignments with Feedback",
+    "heroTitle": "Speak Thai with confidence",
+    "heroSubtitle": "Lessons built for Myanmar speakers — from first greetings to everyday survival phrases.",
+    "subtitle": "Welcome back! Log in to continue learning.",
+    "demoTitle": "Demo account",
+    "demoHint": "Any password works",
+    "required": "This field is required",
+    "learners": "Made for Myanmar learners in Thailand"
   },
   "dashboard": {
     "title": "Thai Learning Portal",
@@ -21,7 +28,20 @@
     "assignments": "Assignments",
     "viewAll": "View All",
     "logout": "Logout",
-    "selectCourse": "Select a Course"
+    "selectCourse": "Select a Course",
+    "heroSubtitle": "A few minutes of practice every day adds up. Pick up where you left off.",
+    "continueLearning": "Continue learning",
+    "phraseOfDay": "Phrase of the day",
+    "phraseMeaning": "Hello (polite greeting)",
+    "listen": "Listen",
+    "due": "Due",
+    "pending": "Pending",
+    "stats": {
+      "inProgress": "Courses in progress",
+      "lessonsDone": "Lessons completed",
+      "pending": "Pending assignments",
+      "overall": "Overall progress"
+    }
   },
   "courses": {
     "beginner": "Beginner",
@@ -30,7 +50,13 @@
     "lessons": "Lessons",
     "startCourse": "Start Course",
     "continueCourse": "Continue",
-    "completed": "Completed"
+    "completed": "Completed",
+    "notStarted": "Not started",
+    "titles": {
+      "beginner": "Beginner Course",
+      "intermediate": "Intermediate Course",
+      "advanced": "Advanced Course"
+    }
   },
   "pronunciation": {
     "title": "Pronunciation",
@@ -50,5 +76,9 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "assignments": {
+    "pronunciation": "Weekly Pronunciation",
+    "writing": "Writing Practice"
   }
 }

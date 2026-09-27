@@ -54,7 +54,11 @@ Output goes to `/dist` folder
 thai-learning-portal/
 ├── src/
 │   ├── components/          # Reusable React components
-│   │   ├── Button.jsx       # Button component (primary/secondary/danger)
+│   │   ├── Button.jsx       # Button component (variants + sizes)
+│   │   ├── Badge.jsx        # Status pill
+│   │   ├── ProgressRing.jsx # Circular progress
+│   │   ├── Icon.jsx         # Inline SVG icons
+│   │   ├── Logo.jsx         # Brand mark
 │   │   ├── Card.jsx         # Card component
 │   │   ├── Input.jsx        # Form input with validation
 │   │   ├── Header.jsx       # App header
@@ -80,22 +84,28 @@ thai-learning-portal/
 
 ## 🎨 Design System
 
-### Colors
-- **Thai Blue:** #1E6B9E (Primary)
-- **Thai Gold:** #D4A574 (Accent)
-- **Thai Green:** #2D7D5C (Success)
-- **Thai Red:** #C94B4B (Error)
+### Colors — "Orchid & Marigold"
+- **Orchid:** #5B4BDB (Primary — Thailand's national flower)
+- **Marigold:** #FBBF3C / #F5A524 (Accent, calls to action)
+- **Coral:** #FF6B5B (Highlights, pending / error states)
+- **Mint:** #16A34A (Success)
+- **Cream:** #FFF9F2 (Background) · **Ink:** #1F1B2E (Text)
+
+Each color has a tint scale in `tailwind.config.js` (e.g. `orchid-50` … `orchid-900`).
 
 ### Typography
-- **Myanmar Text:** Padauk font, 17px size, 1.6 line-height
-- **English Text:** Inter font, 16px size
-- **Thai Text:** Prompt font
+- **UI / English:** Plus Jakarta Sans
+- **Myanmar Text:** Padauk (automatic fallback; taller line-height when `<html lang="my">`)
+- **Thai Text:** Prompt (`font-thai`)
 
 ### Components
-- **Button:** Primary, Secondary, Tertiary, Danger variants
-- **Card:** Hoverable card with shadow effects
-- **Input:** Form input with validation and focus states
-- **Header:** App header with language toggle
+- **Button:** primary, accent, secondary, tertiary, ghost, danger variants; sm / md / lg sizes
+- **Card:** Rounded card with optional hover lift
+- **Input:** Labelled input with icon, focus ring and error state
+- **Badge:** Colored status pill
+- **ProgressRing:** Circular progress indicator
+- **Header:** Sticky header with logo, language switch, user and logout
+- **Icon / Logo:** Inline SVG icons and brand mark
 
 ## 🌐 Internationalization (i18n)
 

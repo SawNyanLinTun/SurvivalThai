@@ -1,36 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Prompt:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
-  box-sizing: border-box;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-cream font-sans text-ink;
+    margin: 0;
+  }
+
+  /* Myanmar script needs a taller line-height to avoid clipped stacked glyphs */
+  html[lang='my'] body {
+    line-height: 1.7;
+  }
+
+  html[lang='my'] h1,
+  html[lang='my'] h2,
+  html[lang='my'] h3 {
+    line-height: 1.5;
+  }
+
+  ::selection {
+    @apply bg-orchid-200 text-orchid-900;
+  }
 }
 
-body {
-  font-family: 'Inter', sans-serif;
-  color: #1a1a1a;
-  background-color: #f8fafb;
-  margin: 0;
-  padding: 0;
-}
+@layer utilities {
+  .font-thai {
+    font-family: 'Prompt', sans-serif;
+  }
 
-/* Myanmar text optimization */
-.font-myanmar {
-  font-family: 'Padauk', sans-serif;
-  line-height: 1.6;
-  font-size: 17px;
-}
-
-/* Thai text optimization */
-.font-thai {
-  font-family: 'Prompt', sans-serif;
-}
-
-/* Smooth transitions */
-button, input, select, textarea {
-  transition: all 0.2s ease-in-out;
+  .bg-dots {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
 }
 
 /* Custom scrollbar */
@@ -40,14 +48,14 @@ button, input, select, textarea {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e6b9e;
-  border-radius: 4px;
+  background: #d6ceff;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #154a75;
+  background: #8f7bfa;
 }
