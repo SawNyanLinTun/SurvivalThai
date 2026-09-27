@@ -1,0 +1,54 @@
+{
+  "auth": {
+    "login": "Login to Thai Learning Portal",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "signup": "Sign up",
+    "features": "Features",
+    "feature1": "Myanmar + English Bilingual Interface",
+    "feature2": "Interactive Pronunciation Learning",
+    "feature3": "Weekly Assignments with Feedback"
+  },
+  "dashboard": {
+    "title": "Thai Learning Portal",
+    "welcome": "Welcome back",
+    "myCourses": "My Courses",
+    "myCourseProgress": "Course Progress",
+    "assignments": "Assignments",
+    "viewAll": "View All",
+    "logout": "Logout",
+    "selectCourse": "Select a Course"
+  },
+  "courses": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "lessons": "Lessons",
+    "startCourse": "Start Course",
+    "continueCourse": "Continue",
+    "completed": "Completed"
+  },
+  "pronunciation": {
+    "title": "Pronunciation",
+    "compare": "Compare",
+    "thaiSound": "Thai Sound",
+    "myanmarSound": "Myanmar Sound",
+    "practice": "Practice",
+    "record": "Record Your Voice",
+    "playback": "Playback",
+    "difference": "Key Differences"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred. Please try again.",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}

@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #1a1a1a;
+  background-color: #f8fafb;
+  margin: 0;
+  padding: 0;
+}
+
+/* Myanmar text optimization */
+.font-myanmar {
+  font-family: 'Padauk', sans-serif;
+  line-height: 1.6;
+  font-size: 17px;
+}
+
+/* Thai text optimization */
+.font-thai {
+  font-family: 'Prompt', sans-serif;
+}
+
+/* Smooth transitions */
+button, input, select, textarea {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e6b9e;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #154a75;
+}
