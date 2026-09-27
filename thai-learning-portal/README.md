@@ -31,8 +31,8 @@ cd thai-learning-portal
 # Install dependencies
 npm install
 
-# Point the app at Supabase (values are public; see .env.example)
-cp .env.example .env
+# Optional: the app connects to the SurvivalThai Supabase project by default.
+# To use a different project, copy .env.example to .env and change the values.
 
 # Start development server
 npm run dev
