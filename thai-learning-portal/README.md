@@ -7,11 +7,11 @@ Learn Thai language designed for Myanmar speakers - Bilingual Myanmar + English 
 - ✅ Myanmar + English bilingual UI (Myanmar primary language)
 - ✅ Responsive design (mobile, tablet, desktop)
 - ✅ User authentication with form validation
+- ✅ Student and Teacher login with separate dashboards
 - ✅ Course dashboard with progress tracking
 - ✅ Assignment management
 - 🔜 Interactive pronunciation learning (coming soon)
 - 🔜 Voice recording practice (coming soon)
-- 🔜 Teacher dashboard (coming soon)
 
 ## 🚀 Quick Start
 
@@ -45,8 +45,14 @@ Output goes to `/dist` folder
 
 ## 📝 Test Login
 
-- **Email:** test@example.com
-- **Password:** anything (any password works in demo)
+Choose **Student** or **Teacher** on the login page, then:
+
+| Role | Email | Goes to |
+|------|-------|---------|
+| Student | student@example.com | `/dashboard` |
+| Teacher | teacher@example.com | `/teacher` |
+
+Any password works in the demo (any valid email works too).
 
 ## 🏗️ Project Structure
 
@@ -67,11 +73,13 @@ thai-learning-portal/
 │   │   └── ProtectedRoute.jsx # Route protection
 │   ├── pages/               # Page components
 │   │   ├── LoginPage.jsx    # Login/Auth page
-│   │   └── DashboardPage.jsx # Dashboard page
+│   │   ├── DashboardPage.jsx # Student dashboard
+│   │   └── TeacherDashboardPage.jsx # Teacher dashboard
 │   ├── theme/               # Theme presets, color generation, ThemeProvider
 │   ├── locales/             # Translations
 │   │   ├── en.json          # English translations
 │   │   └── my.json          # Myanmar translations
+│   ├── auth.js              # Demo auth (login/logout, roles)
 │   ├── App.jsx              # Main app component with routing
 │   ├── main.jsx             # Entry point
 │   ├── i18n.js              # i18next configuration
@@ -123,10 +131,15 @@ The app supports Myanmar and English languages:
 
 ## 🔒 Authentication
 
-Currently uses localStorage-based demo authentication:
-- Test email: test@example.com
-- Any password works for demo
-- Production: Replace with real backend API
+Demo authentication with two roles, handled in `src/auth.js`:
+- The login page has a **Student / Teacher** selector; the chosen role is saved with the email
+  in `localStorage` (the password is never stored).
+- Students land on `/dashboard` (courses, assignments); teachers land on `/teacher`
+  (classes, submissions to review, student progress).
+- `ProtectedRoute role="..."` sends logged-out users to login and redirects users who open
+  the other role's page back to their own dashboard.
+- Production: replace `src/auth.js` with a real backend API (JWT or sessions) that checks
+  passwords and returns the user's role.
 
 ## 📱 Responsive Design
 

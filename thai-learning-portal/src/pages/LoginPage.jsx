@@ -7,6 +7,14 @@ import Logo from '../components/Logo';
 import LanguageToggle from '../components/LanguageToggle';
 import Icon from '../components/Icon';
 import ThemePicker from '../components/ThemePicker';
+import { homeFor, login } from '../auth';
+
+const roles = [
+  { id: 'student', icon: 'student', demo: 'student@example.com' },
+  { id: 'teacher', icon: 'teacher', demo: 'teacher@example.com' },
+];
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const features = [
   { key: 'auth.feature1', icon: 'language' },
@@ -17,26 +25,29 @@ const features = [
 export default function LoginPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [role, setRole] = useState('student');
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
+  const activeRole = roles.find((r) => r.id === role);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
 
     if (!formData.email) newErrors.email = t('auth.required');
+    else if (!EMAIL_PATTERN.test(formData.email)) newErrors.email = t('auth.invalidEmail');
     if (!formData.password) newErrors.password = t('auth.required');
 
     if (Object.keys(newErrors).length === 0) {
-      localStorage.setItem('user', JSON.stringify(formData));
-      navigate('/dashboard');
+      login({ email: formData.email, role });
+      navigate(homeFor(role));
     } else {
       setErrors(newErrors);
     }
   };
 
   const fillDemo = () => {
-    setFormData({ email: 'test@example.com', password: 'demo1234' });
+    setFormData({ email: activeRole.demo, password: 'demo1234' });
     setErrors({});
   };
 
@@ -91,13 +102,51 @@ export default function LoginPage() {
             <h2 className="text-3xl font-extrabold tracking-tight text-ink">{t('auth.loginButton')}</h2>
             <p className="mt-2 text-ink-muted">{t('auth.subtitle')}</p>
 
-            <form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
+            <fieldset className="mt-8">
+              <legend className="mb-2 text-sm font-semibold text-ink">{t('auth.roleLabel')}</legend>
+              <div className="grid grid-cols-2 gap-3">
+                {roles.map((r) => {
+                  const active = r.id === role;
+                  return (
+                    <label
+                      key={r.id}
+                      className={`relative flex cursor-pointer flex-col gap-2 rounded-2xl border-2 p-4 transition-all has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-primary-100 ${
+                        active
+                          ? 'border-primary-500 bg-primary-50'
+                          : 'border-primary-100 bg-surface hover:border-primary-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value={r.id}
+                        checked={active}
+                        onChange={() => setRole(r.id)}
+                        className="sr-only"
+                      />
+                      <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? 'bg-primary-600 text-on-primary' : 'bg-primary-50 text-primary-700'}`}>
+                        <Icon name={r.icon} />
+                      </span>
+                      <span className="font-bold text-ink">{t(`auth.${r.id}`)}</span>
+                      <span className="text-xs leading-snug text-ink-muted">{t(`auth.${r.id}Desc`)}</span>
+                      {active && (
+                        <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-on-primary">
+                          <Icon name="check" className="h-3.5 w-3.5" />
+                        </span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-5" noValidate>
               <Input
                 label={t('auth.email')}
                 type="email"
                 icon="mail"
                 autoComplete="email"
-                placeholder="test@example.com"
+                placeholder={activeRole.demo}
                 required
                 error={errors.email}
                 value={formData.email}
@@ -117,7 +166,7 @@ export default function LoginPage() {
               />
 
               <Button type="submit" size="lg" className="w-full">
-                {t('auth.loginButton')}
+                {t('auth.loginAs', { role: t(`auth.${role}`) })}
                 <Icon name="arrowRight" />
               </Button>
             </form>
@@ -131,9 +180,11 @@ export default function LoginPage() {
                 <Icon name="sparkles" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-bold text-ink">{t('auth.demoTitle')}</span>
+                <span className="block text-sm font-bold text-ink">
+                  {t('auth.demoTitle')} · {t(`auth.${role}`)}
+                </span>
                 <span className="block truncate text-sm text-ink-muted">
-                  test@example.com · {t('auth.demoHint')}
+                  {activeRole.demo} · {t('auth.demoHint')}
                 </span>
               </span>
               <Icon name="arrowRight" className="h-5 w-5 text-accent-700 transition-transform group-hover:translate-x-1" />

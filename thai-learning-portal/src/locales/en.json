@@ -18,7 +18,14 @@
     "demoTitle": "Demo account",
     "demoHint": "Any password works",
     "required": "This field is required",
-    "learners": "Made for Myanmar learners in Thailand"
+    "learners": "Made for Myanmar learners in Thailand",
+    "roleLabel": "Log in as",
+    "student": "Student",
+    "teacher": "Teacher",
+    "studentDesc": "Take lessons and practice",
+    "teacherDesc": "Manage classes and review work",
+    "loginAs": "Log in as {{role}}",
+    "invalidEmail": "Enter a valid email address"
   },
   "dashboard": {
     "title": "Thai Learning Portal",
@@ -98,6 +105,29 @@
       "success": "Success",
       "background": "Background",
       "text": "Text"
+    }
+  },
+  "teacher": {
+    "heroSubtitle": "Here's what's happening in your classes today.",
+    "reviewNow": "Review submissions",
+    "stats": {
+      "students": "Students",
+      "classes": "Active classes",
+      "toReview": "Waiting for review",
+      "avgProgress": "Average progress"
+    },
+    "myClasses": "My Classes",
+    "studentsCount": "{{count}} students",
+    "manage": "Manage class",
+    "submissions": "To review",
+    "submitted": "Submitted",
+    "review": "Review",
+    "studentProgress": "Student progress",
+    "table": {
+      "student": "Student",
+      "course": "Course",
+      "progress": "Progress",
+      "lastActive": "Last active"
     }
   }
 }

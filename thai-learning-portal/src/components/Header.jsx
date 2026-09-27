@@ -4,15 +4,16 @@ import LanguageToggle from './LanguageToggle';
 import ThemePicker from './ThemePicker';
 import Logo from './Logo';
 import Icon from './Icon';
+import { displayName, getUser, logout } from '../auth';
 
 export default function Header() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  const name = user?.email?.split('@')[0];
+  const user = getUser();
+  const name = displayName(user);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    logout();
     navigate('/');
   };
 
@@ -29,7 +30,10 @@ export default function Header() {
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-200 font-bold uppercase text-accent-700">
                   {name?.[0] || '?'}
                 </span>
-                <span className="max-w-[10rem] truncate text-sm font-semibold text-ink">{name}</span>
+                <span className="flex flex-col leading-tight">
+                  <span className="max-w-[10rem] truncate text-sm font-semibold text-ink">{name}</span>
+                  <span className="text-xs text-ink-muted">{t(`auth.${user.role}`)}</span>
+                </span>
               </div>
               <button
                 type="button"

@@ -5,6 +5,7 @@ import Button from '../components/Button';
 import Badge from '../components/Badge';
 import Icon from '../components/Icon';
 import ProgressRing from '../components/ProgressRing';
+import { displayName, getUser } from '../auth';
 
 const courses = [
   { id: 1, key: 'beginner', thai: 'ก', progress: 45, lessons: 12, color: 'primary-600', track: 'primary-100', tile: 'bg-primary-100 text-primary-700', tone: 'primary' },
@@ -19,8 +20,7 @@ const assignments = [
 
 export default function DashboardPage() {
   const { t, i18n } = useTranslation();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const name = user.email?.split('@')[0];
+  const name = displayName(getUser());
 
   const locale = i18n.language === 'my' ? 'my-MM' : 'en-US';
   const formatDate = (iso) =>
