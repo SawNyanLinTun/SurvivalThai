@@ -140,12 +140,34 @@ npm run build
 npm run deploy
 ```
 
+## ☁️ Deploying to Google Cloud (Firebase Hosting)
+
+This app is a static SPA with the backend on Supabase, so it deploys as a static site — no server or container needed. Firebase Hosting (a Google Cloud product) fits this well: free tier, global CDN, automatic SSL, and SPA-friendly rewrites are already configured in `firebase.json`.
+
+1. Install the CLI and log in:
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   ```
+2. Create (or pick) a Firebase project at https://console.firebase.google.com, then point this repo at it:
+   ```bash
+   firebase use --add
+   ```
+   (or edit `.firebaserc` directly with your project ID)
+3. Set your Supabase credentials in `.env` (copy from `.env.example`) — `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from your Supabase project's API settings. These are baked into the build at build time.
+4. Build and deploy:
+   ```bash
+   npm run deploy:firebase
+   ```
+
+Your site will be live at `https://<project-id>.web.app`. Firebase Hosting also supports attaching a custom domain from the console.
+
 ## 📚 Next Steps (Phase 2)
 
 1. **Backend API Integration**
-   - Connect to Node.js/Express backend
-   - Replace localStorage with real database
-   - User authentication with JWT
+   - Wire up the Supabase client SDK
+   - Replace localStorage with Supabase Auth + database
+   - Row-level security policies for user data
 
 2. **Pronunciation Learning**
    - Audio comparison: Thai vs Myanmar sounds
@@ -160,20 +182,16 @@ npm run deploy
    - Assignment grading
 
 4. **Deployment**
-   - Deploy frontend to Vercel
-   - Deploy backend to Railway
+   - Deploy frontend to Google Cloud (Firebase Hosting) ✅ see above
    - Connect custom domain
-   - SSL certificate setup
+   - SSL certificate setup (automatic with Firebase Hosting)
 
 ## 💰 Hosting & Cost
 
-- **Frontend:** Vercel (FREE tier)
-- **Backend:** Railway (FREE tier - $10/month paid)
-- **Database:** PostgreSQL on Railway (FREE tier - $15/month paid)
-- **Domain:** $12/year
-- **Total Year 1:** ~$300
-
-See `Learning_Portal_Cost_Breakdown.md` for details.
+- **Frontend:** Firebase Hosting on Google Cloud (FREE tier covers this project's traffic)
+- **Backend:** Supabase (FREE tier; paid plans start at $25/month if usage grows)
+- **Database:** Supabase Postgres (included in Supabase plan above)
+- **Domain:** $12/year (optional, on top of the free `*.web.app` subdomain)
 
 ## 📖 Documentation
 
