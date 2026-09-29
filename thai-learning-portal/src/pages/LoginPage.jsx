@@ -1,30 +1,43 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Header from '../components/Header';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { signIn } = useAuth();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
     if (!formData.email) newErrors.email = t('common.error');
     if (!formData.password) newErrors.password = t('common.error');
 
-    if (Object.keys(newErrors).length === 0) {
-      localStorage.setItem('user', JSON.stringify(formData));
-      navigate('/dashboard');
-    } else {
+    if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      return;
     }
+
+    setErrors({});
+    setSubmitting(true);
+    const { error } = await signIn(formData.email, formData.password);
+    setSubmitting(false);
+
+    if (error) {
+      setErrors({ form: error.message });
+      return;
+    }
+
+    navigate('/dashboard');
   };
 
   return (
@@ -44,7 +57,7 @@ export default function LoginPage() {
               <Input
                 label={t('auth.email')}
                 type="email"
-                placeholder="test@example.com"
+                placeholder="you@example.com"
                 required
                 error={errors.email}
                 value={formData.email}
@@ -61,20 +74,22 @@ export default function LoginPage() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />
 
-              <Button type="submit" className="w-full">
-                {t('auth.loginButton')}
+              {errors.form && (
+                <p className="text-thai-red text-sm">{errors.form}</p>
+              )}
+
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? t('common.loading') : t('auth.loginButton')}
               </Button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-gray-300 space-y-3">
-              <div className="bg-thai-blue bg-opacity-10 p-4 rounded-lg">
-                <p className="text-sm text-dark-text mb-2">
-                  <strong>📧 Test Email:</strong> test@example.com
-                </p>
-                <p className="text-sm text-dark-text">
-                  <strong>🔑 Password:</strong> anything
-                </p>
-              </div>
+            <div className="mt-6 pt-6 border-t border-gray-300 text-center">
+              <p className="text-sm text-gray-600">
+                {t('auth.noAccount')}{' '}
+                <Link to="/signup" className="text-thai-blue font-semibold hover:underline">
+                  {t('auth.signup')}
+                </Link>
+              </p>
             </div>
           </Card>
         </div>

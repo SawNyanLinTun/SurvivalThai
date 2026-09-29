@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const { user, signOut } = useAuth();
 
   const courses = [
     {
@@ -48,8 +49,8 @@ export default function DashboardPage() {
     },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
 
