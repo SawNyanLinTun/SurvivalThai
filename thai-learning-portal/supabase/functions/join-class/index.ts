@@ -1,8 +1,10 @@
 // Student self-signup with a class join code.
 // Public endpoint (no JWT): validates the code, then creates a confirmed
-// account tied to that one class. The class_id goes into app_metadata,
-// which only the server can set, and the DB trigger turns it into a
-// student profile.
+// account. The profile is left at role='pending' with class_id set to the
+// requested class (a join request, not membership) — a teacher approves
+// or rejects it from the classroom's Students tab before the student can
+// log in. This is what keeps a leaked join code from granting instant
+// access to strangers.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const cors = {
@@ -52,16 +54,22 @@ Deno.serve(async (req) => {
   if (!cls || !cls.published || cls.purged_at) return json({ error: 'invalid_code' }, 404);
   if (cls.end_date < today) return json({ error: 'class_ended' }, 410);
 
-  const { error } = await admin.auth.admin.createUser({
+  const { data: created, error } = await admin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
     user_metadata: { full_name: fullName },
-    app_metadata: { class_id: cls.id, role: 'student' },
   });
   if (error) {
     const taken = /already|registered|exists/i.test(error.message);
     return json({ error: taken ? 'email_taken' : 'server_error' }, taken ? 409 : 500);
   }
+
+  // Record which class they're asking to join. handle_new_user() already
+  // inserted their profile at role='pending' with class_id null; this just
+  // attaches the request for the teacher to see and approve.
+  const { error: reqError } = await admin.from('profiles').update({ class_id: cls.id }).eq('id', created.user.id);
+  if (reqError) return json({ error: 'server_error' }, 500);
+
   return json({ ok: true });
 });

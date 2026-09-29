@@ -29,13 +29,20 @@ export function clearClassStore() {
 const byPosition = (a, b) => a.position - b.position || a.created_at.localeCompare(b.created_at);
 
 function mapClass(row, devicesByUser) {
-  const students = (row.students ?? []).map((p) => ({
-    id: p.id,
-    name: p.full_name || p.email,
-    email: p.email,
-    lastActive: p.last_active || '',
-    devices: devicesByUser[p.id] ?? [],
-  }));
+  const profiles = row.students ?? [];
+  const students = profiles
+    .filter((p) => p.role === 'student')
+    .map((p) => ({
+      id: p.id,
+      name: p.full_name || p.email,
+      email: p.email,
+      lastActive: p.last_active || '',
+      devices: devicesByUser[p.id] ?? [],
+    }));
+  // Joined with the class code but not yet let in by the teacher.
+  const pendingRequests = profiles
+    .filter((p) => p.role === 'pending')
+    .map((p) => ({ id: p.id, name: p.full_name || p.email, email: p.email }));
 
   const assignments = (row.assignments ?? [])
     .sort((a, b) => a.created_at.localeCompare(b.created_at))
@@ -83,6 +90,7 @@ function mapClass(row, devicesByUser) {
     settings: row.settings,
     teacherId: row.teacher_id,
     students,
+    pendingRequests,
     modules: (row.modules ?? []).sort(byPosition).map((m) => ({
       id: m.id,
       title: m.title,
@@ -328,6 +336,18 @@ export async function addStudent(classId, { name, email }) {
 
 export async function removeStudent(classId, studentId) {
   await invokeFunction('manage-students', { action: 'remove', classId, studentId }).catch((e) => {
+    setState({ error: e.message });
+    throw e;
+  });
+  await refreshClasses();
+}
+
+export async function approveJoinRequest(studentId) {
+  await write(() => supabase.rpc('approve_join_request', { p_student_id: studentId }));
+}
+
+export async function rejectJoinRequest(classId, studentId) {
+  await invokeFunction('manage-students', { action: 'reject', classId, studentId }).catch((e) => {
     setState({ error: e.message });
     throw e;
   });

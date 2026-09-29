@@ -2,6 +2,8 @@
 //  - add:          create a student account (temporary password) in a class
 //  - remove:       delete a student account; cascades remove their
 //                  submissions, messages and devices
+//  - reject:       delete a pending join request's account, freeing the
+//                  email for another attempt
 //  - delete-class: delete a class together with its student accounts and files
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -86,6 +88,22 @@ Deno.serve(async (req) => {
     if (files?.length) {
       await admin.storage.from('class-files').remove(files.map((f) => `${cls.id}/${student.id}/${f.name}`));
     }
+    const { error } = await admin.auth.admin.deleteUser(student.id);
+    if (error) return json({ error: 'server_error' }, 500);
+    return json({ ok: true });
+  }
+
+  if (body.action === 'reject') {
+    // Only a pending join request for this class can be rejected.
+    const { data: student } = await admin
+      .from('profiles')
+      .select('id')
+      .eq('id', body.studentId ?? '')
+      .eq('class_id', cls.id)
+      .eq('role', 'pending')
+      .maybeSingle();
+    if (!student) return json({ error: 'not_found' }, 404);
+
     const { error } = await admin.auth.admin.deleteUser(student.id);
     if (error) return json({ error: 'server_error' }, 500);
     return json({ ok: true });

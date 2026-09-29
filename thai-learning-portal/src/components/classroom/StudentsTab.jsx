@@ -8,7 +8,7 @@ import Modal, { ConfirmModal } from '../Modal';
 import EmptyState from '../EmptyState';
 import IconButton from './IconButton';
 import { TextField } from '../Form';
-import { addStudent, removeStudent, resetDevices } from '../../data/classStore';
+import { addStudent, approveJoinRequest, rejectJoinRequest, removeStudent, resetDevices } from '../../data/classStore';
 import { formatDate, initials } from '../../utils/format';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -120,6 +120,37 @@ export default function StudentsTab({ cls }) {
         </Button>
       </Card>
 
+      {cls.pendingRequests.length > 0 && (
+        <Card className="border-highlight-200 bg-highlight-100/40">
+          <div className="mb-3">
+            <p className="font-bold text-ink">{t('classroom.students.pendingTitle', { count: cls.pendingRequests.length })}</p>
+            <p className="text-sm text-ink-muted">{t('classroom.students.pendingHint')}</p>
+          </div>
+          <div className="space-y-2">
+            {cls.pendingRequests.map((p) => (
+              <div key={p.id} className="flex items-center gap-3 rounded-xl bg-surface px-4 py-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-highlight-200 text-xs font-bold text-highlight-700">
+                  {initials(p.name)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-ink">{p.name}</p>
+                  <p className="truncate text-xs text-ink-muted">{p.email}</p>
+                </div>
+                <Button variant="secondary" onClick={() => approveJoinRequest(p.id).catch(() => {})}>
+                  <Icon name="check" /> {t('classroom.students.approve')}
+                </Button>
+                <IconButton
+                  icon="close"
+                  tone="danger"
+                  label={t('classroom.students.reject')}
+                  onClick={() => setDialog({ kind: 'reject', student: p })}
+                />
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-extrabold text-ink">{t('classroom.students.title', { count: cls.students.length })}</h2>
         <Button onClick={() => setDialog({ kind: 'add' })}>
@@ -216,6 +247,15 @@ export default function StudentsTab({ cls }) {
           message={t('classroom.students.removeMessage', { name: dialog.student.name })}
           confirmLabel={t('classroom.students.remove')}
           onConfirm={() => removeStudent(cls.id, dialog.student.id).catch(() => {})}
+          onClose={close}
+        />
+      )}
+      {dialog?.kind === 'reject' && (
+        <ConfirmModal
+          title={t('classroom.students.rejectTitle')}
+          message={t('classroom.students.rejectMessage', { name: dialog.student.name })}
+          confirmLabel={t('classroom.students.reject')}
+          onConfirm={() => rejectJoinRequest(cls.id, dialog.student.id).catch(() => {})}
           onClose={close}
         />
       )}

@@ -13,7 +13,8 @@ async function loadProfile(userId) {
 
 // Returns an error code, or null when the session may continue.
 async function checkAccess(profile, expectedRole) {
-  if (!profile || profile.role === 'pending') return 'not_authorized';
+  if (!profile) return 'not_authorized';
+  if (profile.role === 'pending') return profile.class_id ? 'approval_pending' : 'not_authorized';
   if (expectedRole && profile.role !== expectedRole) return `wrong_role_${profile.role}`;
   const { data, error } = await supabase.rpc('register_device', { p_device_id: deviceId(), p_label: deviceLabel() });
   if (error) return 'server_error';
