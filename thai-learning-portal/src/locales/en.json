@@ -48,6 +48,24 @@
     "continueCourse": "Continue",
     "completed": "Completed"
   },
+  "teacher": {
+    "welcome": "Welcome back",
+    "subtitle": "Manage your classes and students",
+    "createClass": "+ Create Class",
+    "className": "Class name",
+    "level": "Level",
+    "endDate": "Class ends on",
+    "published": "Make this class joinable immediately",
+    "createButton": "Create Class",
+    "noClasses": "You haven't created any classes yet.",
+    "joinCode": "Join code",
+    "regenerateCode": "Regenerate",
+    "publishedBadge": "Published",
+    "unpublishedBadge": "Unpublished",
+    "viewRoster": "View students",
+    "hideRoster": "Hide students",
+    "noStudents": "No students have joined this class yet."
+  },
   "pronunciation": {
     "title": "Pronunciation",
     "compare": "Compare",

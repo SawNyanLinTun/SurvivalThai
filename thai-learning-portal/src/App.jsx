@@ -5,7 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import JoinClassPage from './pages/JoinClassPage';
-import DashboardPage from './pages/DashboardPage';
+import DashboardRouter from './pages/DashboardRouter';
 import ProtectedRoute, { RequireSession } from './components/ProtectedRoute';
 
 export default function App() {
@@ -27,7 +27,7 @@ export default function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <DashboardPage />
+                <DashboardRouter />
               </ProtectedRoute>
             }
           />
