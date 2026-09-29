@@ -35,6 +35,10 @@ export function AuthProvider({ children }) {
     signIn: (email, password) =>
       supabase.auth.signInWithPassword({ email, password }),
     signOut: () => supabase.auth.signOut(),
+    verifySignupCode: (email, token) =>
+      supabase.auth.verifyOtp({ email, token, type: 'signup' }),
+    resendSignupCode: (email) =>
+      supabase.auth.resend({ type: 'signup', email }),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { signUp, verifySignupCode, resendSignupCode } = useAuth();
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -19,7 +19,9 @@ export default function SignupPage() {
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [confirmationSent, setConfirmationSent] = useState(false);
+  const [awaitingCode, setAwaitingCode] = useState(false);
+  const [code, setCode] = useState('');
+  const [resent, setResent] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,8 +56,41 @@ export default function SignupPage() {
     if (data.session) {
       navigate('/dashboard');
     } else {
-      setConfirmationSent(true);
+      setAwaitingCode(true);
     }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (!code) {
+      setErrors({ code: t('common.error') });
+      return;
+    }
+
+    setErrors({});
+    setSubmitting(true);
+    const { error } = await verifySignupCode(formData.email, code);
+    setSubmitting(false);
+
+    if (error) {
+      setErrors({ code: error.message });
+      return;
+    }
+
+    navigate('/dashboard');
+  };
+
+  const handleResend = async () => {
+    setErrors({});
+    setSubmitting(true);
+    const { error } = await resendSignupCode(formData.email);
+    setSubmitting(false);
+
+    if (error) {
+      setErrors({ code: error.message });
+      return;
+    }
+    setResent(true);
   };
 
   return (
@@ -66,12 +101,41 @@ export default function SignupPage() {
           <Card>
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-thai-blue mb-2">
-                {t('auth.signupTitle')}
+                {awaitingCode ? t('auth.enterCodeTitle') : t('auth.signupTitle')}
               </h1>
             </div>
 
-            {confirmationSent ? (
-              <p className="text-center text-dark-text">{t('auth.checkEmail')}</p>
+            {awaitingCode ? (
+              <form onSubmit={handleVerify} className="space-y-4">
+                <p className="text-sm text-gray-600 text-center mb-2">
+                  {t('auth.enterCodeHint', { email: formData.email })}
+                </p>
+
+                <Input
+                  label={t('auth.code')}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  required
+                  error={errors.code}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.trim())}
+                />
+
+                <Button type="submit" className="w-full" disabled={submitting}>
+                  {submitting ? t('common.loading') : t('auth.verifyButton')}
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={submitting}
+                  className="w-full text-sm text-thai-blue hover:underline"
+                >
+                  {resent ? t('auth.codeResent') : t('auth.resendCode')}
+                </button>
+              </form>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
