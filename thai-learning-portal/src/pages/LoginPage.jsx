@@ -174,31 +174,44 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-5" noValidate>
-              {joining && (
-                <>
-                  <Input
-                    label={t('auth.joinCode')}
-                    icon="userPlus"
-                    autoComplete="off"
-                    placeholder="KB7Q2M"
-                    maxLength={6}
-                    required
-                    error={errors.joinCode}
-                    value={formData.joinCode}
-                    onChange={(e) => setFormData({ ...formData, joinCode: e.target.value.toUpperCase() })}
-                    className="font-mono uppercase tracking-[0.3em]"
-                  />
-                  <Input
-                    label={t('auth.fullName')}
-                    icon="student"
-                    autoComplete="name"
-                    required
-                    error={errors.fullName}
-                    value={formData.fullName}
-                    onChange={set('fullName')}
-                  />
-                </>
-              )}
+              <div
+                className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                  joining ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                }`}
+                aria-hidden={!joining}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <div
+                    className={`space-y-5 transition-opacity duration-200 ${
+                      joining ? 'opacity-100 delay-100' : 'opacity-0'
+                    }`}
+                  >
+                    <Input
+                      label={t('auth.joinCode')}
+                      icon="userPlus"
+                      autoComplete="off"
+                      placeholder="KB7Q2M"
+                      maxLength={6}
+                      required
+                      tabIndex={joining ? undefined : -1}
+                      error={errors.joinCode}
+                      value={formData.joinCode}
+                      onChange={(e) => setFormData({ ...formData, joinCode: e.target.value.toUpperCase() })}
+                      className="font-mono uppercase tracking-[0.3em]"
+                    />
+                    <Input
+                      label={t('auth.fullName')}
+                      icon="student"
+                      autoComplete="name"
+                      required
+                      tabIndex={joining ? undefined : -1}
+                      error={errors.fullName}
+                      value={formData.fullName}
+                      onChange={set('fullName')}
+                    />
+                  </div>
+                </div>
+              </div>
 
               <Input
                 label={t('auth.email')}
