@@ -4,8 +4,9 @@ import './index.css';
 import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import JoinClassPage from './pages/JoinClassPage';
 import DashboardPage from './pages/DashboardPage';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute, { RequireSession } from './components/ProtectedRoute';
 
 export default function App() {
   return (
@@ -14,6 +15,14 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route
+            path="/join-class"
+            element={
+              <RequireSession>
+                <JoinClassPage />
+              </RequireSession>
+            }
+          />
           <Route
             path="/dashboard"
             element={
